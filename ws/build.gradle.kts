@@ -52,10 +52,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 application {
-    mainClassName = "lt.markmerkk.ReginaApp"
+    mainClassName = "lt.markmerkk.ReginaAppKt"
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
     launchScript()
 }
-
