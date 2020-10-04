@@ -30,7 +30,7 @@ dependencies {
     // Other
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
     implementation("commons-io:commons-io:2.5")
-    implementation("com.google.guava:guava:21.0")
+    implementation("com.google.guava:guava:29.0-jre")
     implementation("io.reactivex.rxjava3:rxjava:3.0.6")
 
     // Monitoring
