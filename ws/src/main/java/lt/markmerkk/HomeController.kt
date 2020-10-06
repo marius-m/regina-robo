@@ -5,9 +5,12 @@ import lt.markmerkk.entities.ResponseOutput
 import lt.markmerkk.runner.ConvertProcessRunnerImpl
 import lt.markmerkk.runner.FSSourcePath
 import lt.markmerkk.runner.TTSFSInteractor
+import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/api/")
@@ -60,5 +63,34 @@ class HomeController(
         return ResponseOutput(
                 outputResources = outputFiles
         )
+    }
+
+    @RequestMapping(
+            value = ["/output-fetch/{fileName}"],
+            method = [RequestMethod.GET],
+            produces = ["application/json"]
+    )
+    @ResponseBody
+    fun fetchOutput(
+            @PathVariable("fileName") fileName: String
+    ): ByteArray {
+        val outputFile = fsInteractor.outputFiles()
+                .firstOrNull { it.name == fileName }
+        if (outputFile != null) {
+            return FileUtils.readFileToByteArray(outputFile)
+        } else {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found")
+        }
+    }
+
+    @RequestMapping(
+            value = ["/output-files"],
+            method = [RequestMethod.GET],
+            produces = ["application/json"]
+    )
+    @ResponseBody
+    fun outputFiles(): List<String> {
+        return fsInteractor.outputFiles()
+                .map { it.name }
     }
 }

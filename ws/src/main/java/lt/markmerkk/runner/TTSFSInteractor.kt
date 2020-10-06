@@ -50,8 +50,9 @@ class TTSFSInteractor(
     fun extractToOutputDir(): Completable {
         return Completable.defer {
             val outputDir = sourcePath.outputDir()
-            logger.debug("Extracting to ${outputDir.absolutePath}")
-            formatterFiles()
+            val formatterFiles = formatterFiles()
+            logger.debug("Extracting to ${outputDir.absolutePath}: [${formatterFiles}]")
+            formatterFiles
                     .forEach { FileUtils.copyFileToDirectory(it, outputDir) }
             Completable.complete()
         }
@@ -97,6 +98,8 @@ class FormatterOutputFilter: FilenameFilter {
     override fun accept(dir: File, name: String): Boolean {
         return name.startsWith(Consts.OUTPUT_PREFIX)
                 && (name.endsWith(Consts.OUTPUT_EXTENSION_TXT) || name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO))
+                || name == Consts.INPUT_FILENAME
+                || name == Consts.INPUT_FILENAME_ENCODED
     }
 }
 
