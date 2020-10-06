@@ -60,9 +60,14 @@ class HomeController(
                 }.andThen(fsInteractor.extractToOutputDir())
                 .andThen(fsInteractor.printOutputFiles())
                 .blockingGet()
-        return ResponseOutput(
-                outputResources = outputFiles
-        )
+        if (outputFiles.isNotEmpty()) {
+            return ResponseOutput(
+                    text = inputText.inputText,
+                    resources = outputFiles
+            )
+        } else {
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Was not able to convert!")
+        }
     }
 
     @RequestMapping(
