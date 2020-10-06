@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Scope
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 import java.io.File
+import java.time.Clock
+import java.time.ZoneId
 
 @Component
 class DefaultComponents {
@@ -43,9 +45,10 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideFsInteractor(
-            fsSourcePath: FSSourcePath
+            fsSourcePath: FSSourcePath,
+            timeProvider: TimeProvider
     ): TTSFSInteractor {
-        return TTSFSInteractor(fsSourcePath)
+        return TTSFSInteractor(fsSourcePath, timeProvider)
     }
 
     @Bean
@@ -61,101 +64,14 @@ class DefaultComponents {
         )
     }
 
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideTssAudioFileCombiner(
-//            fsSourcePath: FSSourcePath,
-//            ttsfsInteractor: TTSFSInteractor
-//    ): TTSAudioFileCombiner {
-//        return TTSAudioFileCombiner(fsSourcePath, ttsfsInteractor)
-//    }
-
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideTtsTextInteractor(): TTSTextInteractor {
-//        return TTSTextInteractor(maxSymbolsPerSection = 400)
-//    }
-
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideConverterInteractor2(
-//            fsInteractor: TTSFSInteractor,
-//            convertProcessRunner: ConvertProcessRunner,
-//            fsSourcePath: FSSourcePath,
-//            ttsAudioFileCombiner: TTSAudioFileCombiner,
-//            ttsTextInteractor: TTSTextInteractor
-//    ): TTSConverterInteractor {
-//        return TTSConverterInteractor(
-//                fsInteractor,
-//                convertProcessRunner,
-//                fsSourcePath,
-//                ttsAudioFileCombiner,
-//                ttsTextInteractor
-//        )
-//    }
-//
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideTTSRunner(
-//            ttsConverterInteractor: TTSConverterInteractor,
-//            ttsRunnerListenerRssMapper: TTSRunnerListenerRssMapper,
-//            timeProvider: TimeProvider
-//    ): TTSRunner {
-//        val executor = Executors.newSingleThreadExecutor()
-//        return TTSRunner(
-//                ttsConverterInteractor,
-//                Schedulers.from(executor),
-//                timeProvider
-//        ).apply {
-//            onAttach()
-//            register(ttsRunnerListenerRssMapper)
-//        }
-//    }
-//
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideTTSScheduler(
-//            ttsRunner: TTSRunner
-//    ): TTSScheduler {
-//        return TTSScheduler(ttsRunner)
-//                .apply { onAttach() }
-//    }
-//
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideTTSMappingListener(
-//            ttsRunner: TTSRunner,
-//            ttsfsInteractor: TTSFSInteractor
-//    ): TTSMappingListener {
-//        return TTSMappingListener(
-//                runnerListener = TTSResultListenerRunner(
-//                        ttsRunner,
-//                        Schedulers.from(Executors.newSingleThreadExecutor())
-//                ),
-//                fsListener = TTSResultListenerFs(ttsfsInteractor)
-//        )
-//    }
-//
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideRssSourceProvider(
-//            rssFeedDao: RssFeedDao,
-//            uuidGenerator: UUIDGenerator
-//    ): RssSourceProvider {
-//        return RssSourceProvider(
-//                rssLink = "https://www.delfi.lt/rss/feeds/daily.xml",
-//                uuidGenerator = uuidGenerator
-//        )
-//    }
-//
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideTimeProvider(): TimeProvider {
-//        return TimeProvider(
-//                zoneId = ZoneId.systemDefault(),
-//                clock = Clock.systemUTC()
-//        )
-//    }
+    @Bean
+    @Scope("singleton")
+    open fun provideTimeProvider(): TimeProvider {
+        return TimeProvider(
+                zoneId = ZoneId.systemDefault(),
+                clock = Clock.systemUTC()
+        )
+    }
 
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!
 

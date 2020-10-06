@@ -30,4 +30,16 @@ class FSSourcePath(
         return outputDir
     }
 
+    fun outputDirById(id: String): File {
+        val outputDirById = File(outputDir(), id)
+        if (!outputDirById.exists()) {
+            outputDirById.mkdirs()
+        }
+        return outputDirById
+    }
+
+    fun hasOutputById(id: String): Boolean {
+        return File(outputDir(), id).exists()
+    }
+
 }
