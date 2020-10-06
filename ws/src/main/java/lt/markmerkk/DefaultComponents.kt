@@ -2,6 +2,8 @@ package lt.markmerkk
 
 import lt.markmerkk.runner.ConvertProcessRunnerImpl
 import lt.markmerkk.runner.FSRunnerPath
+import lt.markmerkk.runner.FSSourcePath
+import lt.markmerkk.runner.TTSFSInteractor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -30,21 +32,21 @@ class DefaultComponents {
         )
     }
 
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideFsSourcePath(
-//            resourceLoader: ResourceLoader
-//    ): FSSourcePath {
-//        return FSSourcePath(resourceLoader)
-//    }
+    @Bean
+    @Scope("singleton")
+    open fun provideFSSourcePath(
+            fsRunnerPath: FSRunnerPath
+    ): FSSourcePath {
+        return FSSourcePath(fsRunnerPath)
+    }
 
-//    @Bean
-//    @Scope("singleton")
-//    open fun provideFsInteractor(
-//            fsSourcePath: FSSourcePath
-//    ): TTSFSInteractor {
-//        return TTSFSInteractor(fsSourcePath, PropsReader)
-//    }
+    @Bean
+    @Scope("singleton")
+    open fun provideFsInteractor(
+            fsSourcePath: FSSourcePath
+    ): TTSFSInteractor {
+        return TTSFSInteractor(fsSourcePath)
+    }
 
     @Bean
     @Scope("singleton")

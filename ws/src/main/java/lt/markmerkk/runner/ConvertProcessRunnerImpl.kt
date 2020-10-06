@@ -2,13 +2,10 @@ package lt.markmerkk.runner
 
 import io.reactivex.rxjava3.core.Completable
 import lt.markmerkk.Consts
-import lt.markmerkk.Paths
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ResourceLoader
-import org.springframework.core.io.support.ResourcePatternUtils
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
 
@@ -26,7 +23,7 @@ class ConvertProcessRunnerImpl(
             logger.debug("Directory: in ${fsRunnerPath.toolDir.absolutePath}")
             logger.debug("Tool: in ${fsRunnerPath.toolFile.absolutePath}")
             logger.debug("Recording text: ${FileUtils.readFileToString(fsRunnerPath.input, Consts.ENCODING)}")
-            val process = ProcessBuilder(fsRunnerPath.toolFile.absolutePath)
+            val process = ProcessBuilder("wine", fsRunnerPath.toolFile.absolutePath)
                     .directory(fsRunnerPath.toolDir)
                     .start()
             printStream("IS", process.inputStream)
