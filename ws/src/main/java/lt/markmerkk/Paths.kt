@@ -7,6 +7,5 @@ object Paths {
     const val TTS_INPUT = "duom.txt"
     const val TTS_INPUT_NO_ENCODING = "duom-utf8.txt"
     const val TTS_OUTPUT_RECORD_RAW = "record.wav"
-    const val TTS_OUTPUT_RECORD = "record.mp3"
     const val TTS_OUTPUT_CONFIG = "record.properties"
 }

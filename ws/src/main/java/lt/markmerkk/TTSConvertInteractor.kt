@@ -48,7 +48,6 @@ class TTSConvertInteractor(
 
     fun streamCombineAudio(id: String): Single<List<File>> {
         return audioFileCombiner.combineAudioFiles(id = id)
-                .flatMap { audioFileCombiner.convertWavToMp3(id = id) }
                 .flatMap { fsInteractor.cleanToRootAudioOnly(id = id) }
     }
 

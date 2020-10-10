@@ -3,10 +3,6 @@ package lt.markmerkk.runner
 import io.reactivex.rxjava3.core.Single
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
-import ws.schild.jave.Encoder
-import ws.schild.jave.MultimediaObject
-import ws.schild.jave.encode.AudioAttributes
-import ws.schild.jave.encode.EncodingAttributes
 import java.io.File
 import java.io.SequenceInputStream
 import javax.sound.sampled.AudioFileFormat
@@ -19,33 +15,6 @@ import javax.sound.sampled.AudioSystem
 class TTSAudioFileCombiner(
         private val fsSourcePath: FSSourcePath
 ) {
-
-    private val encoder = Encoder()
-    private val audioAttrs = AudioAttributes().apply {
-        setCodec("libmp3lame")
-        setBitRate(128000)
-        setChannels(2)
-        setSamplingRate(44100)
-    }
-    private val encodingAttrs = EncodingAttributes().apply {
-        setInputFormat("wav")
-        setOutputFormat("mp3")
-        setAudioAttributes(audioAttrs)
-    }
-
-    fun convertWavToMp3(id: String): Single<File> {
-        return Single.defer {
-            try {
-                val rootFile = fsSourcePath.rootAudioByIdTmp(id)
-                val targetFile = fsSourcePath.rootAudioById(id)
-                encoder.encode(MultimediaObject(rootFile), targetFile, encodingAttrs)
-                Single.just(targetFile)
-            } catch (ex: Exception) {
-                logger.warn("Error converting root file", ex)
-                Single.error<File>(ex)
-            }
-        }
-    }
 
     /**
      * Combine audio files into 1 long file

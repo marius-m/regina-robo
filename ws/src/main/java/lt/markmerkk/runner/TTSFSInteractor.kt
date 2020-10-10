@@ -39,7 +39,7 @@ class TTSFSInteractor(
 
     fun cleanToRootAudioOnly(id: String): Single<List<File>> {
         return Single.defer {
-            val rootAudio = sourcePath.rootAudioById(id)
+            val rootAudio = sourcePath.rootAudioByIdTmp(id)
             sourcePath.outputFilesById(id)
                     .filterNot { it.absolutePath == rootAudio.absolutePath }
                     .forEach { it.delete() }

@@ -63,11 +63,6 @@ class FSSourcePath(
         return File(outputDirById, Paths.TTS_OUTPUT_RECORD_RAW)
     }
 
-    fun rootAudioById(id: String): File {
-        val outputDirById = outputDirById(id)
-        return File(outputDirById, Paths.TTS_OUTPUT_RECORD)
-    }
-
     fun configById(id: String): File {
         val outputDirById = outputDirById(id)
         return File(outputDirById, Paths.TTS_OUTPUT_CONFIG)
