@@ -32,6 +32,8 @@ dependencies {
     implementation("commons-io:commons-io:2.5")
     implementation("com.google.guava:guava:29.0-jre")
     implementation("io.reactivex.rxjava3:rxjava:3.0.6")
+    implementation("ws.schild:jave-core:3.0.1")
+    implementation("ws.schild:jave-all-deps:3.0.1")
 
     // Monitoring
     implementation("org.slf4j:slf4j-api:1.7.27")

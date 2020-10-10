@@ -80,7 +80,9 @@ class HomeController(
                             files = formatFiles
                     )
                 }
-        val streamCombineAudio = audioFileCombiner.combineAudioFiles(id = targetId)
+        val streamCombineAudio: Single<List<File>> = audioFileCombiner.combineAudioFiles(id = targetId)
+                .flatMap { audioFileCombiner.convertWavToMp3(id = targetId) }
+                .flatMap { Single.just(fsSourcePath.outputFilesById(id = targetId)) }
         val outputFiles: List<File> = streamCleanUp
                 .andThen(streamConvertText)
                 .toList()
