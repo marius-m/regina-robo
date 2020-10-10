@@ -1,5 +1,6 @@
 package lt.markmerkk
 
+import lt.markmerkk.runner.FSSourcePath
 import lt.markmerkk.runner.TTSFSInteractor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,12 +11,13 @@ import org.springframework.scheduling.annotation.Scheduled
 @Configuration
 @EnableScheduling
 class SchedulerConfig(
-        @Autowired private val ttsfsInteractor: TTSFSInteractor
+        @Autowired private val fsInteractor: TTSFSInteractor,
+        @Autowired private val fsSourcePath: FSSourcePath
 ) {
 
     @Scheduled(fixedDelay = MINUTE * 30)
     fun scheduleCleanOutput() {
-        ttsfsInteractor.cleanUpOldOutput()
+        fsInteractor.cleanUpOutput(fsSourcePath.outputFilesOld())
                 .subscribe()
     }
 

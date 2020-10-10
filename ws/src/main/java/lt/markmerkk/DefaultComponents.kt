@@ -1,9 +1,6 @@
 package lt.markmerkk
 
-import lt.markmerkk.runner.ConvertProcessRunnerImpl
-import lt.markmerkk.runner.FSRunnerPath
-import lt.markmerkk.runner.FSSourcePath
-import lt.markmerkk.runner.TTSFSInteractor
+import lt.markmerkk.runner.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -37,9 +34,10 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideFSSourcePath(
-            fsRunnerPath: FSRunnerPath
+            fsRunnerPath: FSRunnerPath,
+            timeProvider: TimeProvider
     ): FSSourcePath {
-        return FSSourcePath(fsRunnerPath)
+        return FSSourcePath(fsRunnerPath, timeProvider)
     }
 
     @Bean
@@ -53,15 +51,28 @@ class DefaultComponents {
 
     @Bean
     @Scope("singleton")
+    open fun provideAudioCombiner(
+            fsSourcePath: FSSourcePath,
+            fsInteractor: TTSFSInteractor
+    ): TTSAudioFileCombiner {
+        return TTSAudioFileCombiner(fsSourcePath)
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun provideTextInteractor(): TTSTextInteractor {
+        return TTSTextInteractor(maxSymbolsPerSection = TTSTextInteractor.DEFAULT_MAX_SYMBOLS)
+    }
+
+    @Bean
+    @Scope("singleton")
     @Profile("dev")
     open fun provideConvertProcessRunnerIntel(
             resourceLoader: ResourceLoader,
-            fsRunnerPath: FSRunnerPath
+            fsRunnerPath: FSRunnerPath,
+            fsSourcePath: FSSourcePath
     ): ConvertProcessRunnerImpl {
-        return ConvertProcessRunnerImpl(
-                resourceLoader,
-                fsRunnerPath
-        )
+        return ConvertProcessRunnerImpl(fsRunnerPath, fsSourcePath)
     }
 
     @Bean

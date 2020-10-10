@@ -1,24 +1,27 @@
 package lt.markmerkk.runner
 
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import lt.markmerkk.Consts
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ResourceLoader
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
 
 class ConvertProcessRunnerImpl(
-        resourceLoader: ResourceLoader,
-        private val fsRunnerPath: FSRunnerPath
+        private val fsRunnerPath: FSRunnerPath,
+        private val fsSourcePath: FSSourcePath
 ): ConvertProcessRunner {
 
     /**
      * Runs a conversion process and returns output
      */
-    override fun run(): Completable {
-        return Completable.fromAction {
+    override fun run(id: String): Single<List<File>> {
+        return Single.defer {
             logger.debug("--- Converter ---")
             logger.debug("Directory: in ${fsRunnerPath.toolDir.absolutePath}")
             logger.debug("Tool: in ${fsRunnerPath.toolFile.absolutePath}")
@@ -28,7 +31,7 @@ class ConvertProcessRunnerImpl(
                     .start()
             printStream("IS", process.inputStream)
             printStream("Error", process.errorStream)
-            Completable.complete()
+            Single.just(fsSourcePath.formatterFiles())
         }
     }
 

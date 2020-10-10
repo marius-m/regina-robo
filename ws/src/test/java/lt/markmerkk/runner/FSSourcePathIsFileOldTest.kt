@@ -7,7 +7,7 @@ import org.junit.Test
 import java.time.*
 
 
-class TTSFSInteractorIsFileOldTest {
+class FSSourcePathIsFileOldTest {
 
     @Test
     fun oneHourPass() {
@@ -16,7 +16,7 @@ class TTSFSInteractorIsFileOldTest {
         val fileCreateTime = LocalDateTime.of(1970, 1, 1, 9, 0)
 
         // Act
-        val result = TTSFSInteractor.isFileOld(
+        val result = FSSourcePath.isFileOld(
                 fileCreateTime = fileCreateTime,
                 now = now
         )
@@ -32,7 +32,7 @@ class TTSFSInteractorIsFileOldTest {
         val fileCreateTime = LocalDateTime.of(1970, 1, 1, 9, 0)
 
         // Act
-        val result = TTSFSInteractor.isFileOld(
+        val result = FSSourcePath.isFileOld(
                 fileCreateTime = fileCreateTime,
                 now = now
         )
@@ -48,7 +48,7 @@ class TTSFSInteractorIsFileOldTest {
         val fileCreateTime = LocalDateTime.of(1970, 1, 1, 9, 0)
 
         // Act
-        val result = TTSFSInteractor.isFileOld(
+        val result = FSSourcePath.isFileOld(
                 fileCreateTime = fileCreateTime,
                 now = now
         )
