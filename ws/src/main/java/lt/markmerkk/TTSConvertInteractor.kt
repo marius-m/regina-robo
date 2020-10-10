@@ -3,8 +3,10 @@ package lt.markmerkk
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
+import lt.markmerkk.config.TTSRecordConfig
 import lt.markmerkk.runner.*
 import java.io.File
+import java.time.LocalDateTime
 
 class TTSConvertInteractor(
         private val fsInteractor: TTSFSInteractor,
@@ -48,6 +50,19 @@ class TTSConvertInteractor(
         return audioFileCombiner.combineAudioFiles(id = id)
                 .flatMap { audioFileCombiner.convertWavToMp3(id = id) }
                 .flatMap { fsInteractor.cleanToRootAudioOnly(id = id) }
+    }
+
+    fun streamRecordConfig(
+            id: String,
+            fetchTime: LocalDateTime,
+            text: String
+    ): Single<File> {
+        val record = TTSRecordConfig(
+                id = id,
+                fetchDateTime = fetchTime,
+                text = text
+        )
+        return fsInteractor.recordConfig(id, record)
     }
 
 }

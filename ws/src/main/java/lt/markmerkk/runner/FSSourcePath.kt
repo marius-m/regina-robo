@@ -32,7 +32,7 @@ class FSSourcePath(
     }
 
     fun outputDir(): File {
-        val outputDir = File(fsRunnerPath.toolDir, Paths.TTS_OUTPUT)
+        val outputDir = File(fsRunnerPath.toolDir, Paths.TTS_OUTPUT_DIR)
         if (!outputDir.exists()) {
             outputDir.mkdirs()
         }
@@ -60,12 +60,17 @@ class FSSourcePath(
 
     fun rootAudioByIdTmp(id: String): File {
         val outputDirById = outputDirById(id)
-        return File(outputDirById, "root.wav")
+        return File(outputDirById, Paths.TTS_OUTPUT_RECORD_RAW)
     }
 
     fun rootAudioById(id: String): File {
         val outputDirById = outputDirById(id)
-        return File(outputDirById, "root.mp3")
+        return File(outputDirById, Paths.TTS_OUTPUT_RECORD)
+    }
+
+    fun configById(id: String): File {
+        val outputDirById = outputDirById(id)
+        return File(outputDirById, Paths.TTS_OUTPUT_CONFIG)
     }
 
     fun hasOutputById(id: String): Boolean {

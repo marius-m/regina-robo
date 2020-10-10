@@ -3,9 +3,12 @@ package lt.markmerkk.runner
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import lt.markmerkk.TimeProvider
+import lt.markmerkk.config.TTSRecordConfig
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 class TTSFSInteractor(
         private val sourcePath: FSSourcePath,
@@ -77,6 +80,23 @@ class TTSFSInteractor(
             }
             val outputFilesById = sourcePath.outputFilesById(id)
             Single.just(outputFilesById)
+        }
+    }
+
+    /**
+     * Creates configuration file for additional info
+     */
+    fun recordConfig(id: String, record: TTSRecordConfig): Single<File> {
+        return Single.defer {
+            val targetFile = sourcePath.configById(id)
+            val recordAsMap = record.toMap()
+            val props = Properties().apply {
+                recordAsMap.forEach { entry ->
+                    setProperty(entry.key, entry.value)
+                }
+            }
+            props.store(FileOutputStream(targetFile), "Record config")
+            Single.just(targetFile)
         }
     }
 

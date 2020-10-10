@@ -1,5 +1,6 @@
 package lt.markmerkk
 
+import io.reactivex.rxjava3.core.Single
 import lt.markmerkk.entities.RequestInput
 import lt.markmerkk.entities.ResponseOutput
 import lt.markmerkk.runner.*
@@ -16,7 +17,8 @@ class HomeController(
         @Autowired private val fsInteractor: TTSFSInteractor,
         @Autowired private val fsSourcePath: FSSourcePath,
         @Autowired private val uuidGenerator: UUIDGenerator,
-        @Autowired private val convertInteractor: TTSConvertInteractor
+        @Autowired private val convertInteractor: TTSConvertInteractor,
+        @Autowired private val timeProvider: TimeProvider
 ) {
 
     @RequestMapping(
@@ -54,10 +56,13 @@ class HomeController(
             @RequestBody inputRequest: RequestInput
     ): ResponseOutput {
         val targetId = uuidGenerator.generate()
+        val now = timeProvider.now()
         val outputFiles: List<File> = convertInteractor.streamCleanUp()
                 .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
                 .toList()
                 .flatMap { convertInteractor.streamCombineAudio(targetId) }
+                .flatMap { convertInteractor.streamRecordConfig(targetId, now, inputRequest.inputText) }
+                .flatMap { Single.just(fsSourcePath.outputFilesById(targetId)) }
                 .blockingGet()
         if (outputFiles.isNotEmpty()) {
             return ResponseOutput(
