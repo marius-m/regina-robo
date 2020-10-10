@@ -58,9 +58,14 @@ class FSSourcePath(
                 .filter { outputFile -> isFileOld(fileCreateTime(outputFile), now) }
     }
 
-    fun mergeAudioRootById(id: String): File {
+    fun rootAudioByIdTmp(id: String): File {
         val outputDirById = outputDirById(id)
         return File(outputDirById, "root.wav")
+    }
+
+    fun rootAudioById(id: String): File {
+        val outputDirById = outputDirById(id)
+        return File(outputDirById, "root.mp3")
     }
 
     fun hasOutputById(id: String): Boolean {

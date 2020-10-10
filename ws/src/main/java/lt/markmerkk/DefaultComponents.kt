@@ -66,13 +66,31 @@ class DefaultComponents {
 
     @Bean
     @Scope("singleton")
-    @Profile("dev")
-    open fun provideConvertProcessRunnerIntel(
+    open fun provideConvertProcessRunner(
             resourceLoader: ResourceLoader,
             fsRunnerPath: FSRunnerPath,
             fsSourcePath: FSSourcePath
-    ): ConvertProcessRunnerImpl {
+    ): ConvertProcessRunner {
         return ConvertProcessRunnerImpl(fsRunnerPath, fsSourcePath)
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun provideConvertInteractor(
+            fsRunnerPath: FSRunnerPath,
+            fsSourcePath: FSSourcePath,
+            fsInteractor: TTSFSInteractor,
+            audioFileCombiner: TTSAudioFileCombiner,
+            textInteractor: TTSTextInteractor,
+            convertProcessRunner: ConvertProcessRunner
+    ): TTSConvertInteractor {
+        return TTSConvertInteractor(
+                fsInteractor,
+                textInteractor,
+                audioFileCombiner,
+                convertProcessRunner,
+                fsSourcePath
+        )
     }
 
     @Bean

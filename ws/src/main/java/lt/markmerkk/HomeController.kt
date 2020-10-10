@@ -1,8 +1,5 @@
 package lt.markmerkk
 
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
 import lt.markmerkk.entities.RequestInput
 import lt.markmerkk.entities.ResponseOutput
 import lt.markmerkk.runner.*
@@ -16,12 +13,10 @@ import java.io.File
 @RestController
 @RequestMapping("/api/")
 class HomeController(
-        @Autowired private val runner: ConvertProcessRunnerImpl,
         @Autowired private val fsInteractor: TTSFSInteractor,
-        @Autowired private val audioFileCombiner: TTSAudioFileCombiner,
-        @Autowired private val textInteractor: TTSTextInteractor,
         @Autowired private val fsSourcePath: FSSourcePath,
-        @Autowired private val uuidGenerator: UUIDGenerator
+        @Autowired private val uuidGenerator: UUIDGenerator,
+        @Autowired private val convertInteractor: TTSConvertInteractor
 ) {
 
     @RequestMapping(
@@ -59,34 +54,10 @@ class HomeController(
             @RequestBody inputRequest: RequestInput
     ): ResponseOutput {
         val targetId = uuidGenerator.generate()
-        val inputAsTextSections = textInteractor.split(inputRequest.inputText)
-        val indexTextSections: List<Pair<Int, String>> = inputAsTextSections
-                .mapIndexed { index, s -> index to s }
-        val streamCleanUp: Completable = fsInteractor.cleanUpFormatter()
-        val streamConvertText: Flowable<List<File>> = Flowable.fromIterable(indexTextSections)
-                .flatMapSingle { (index, textSection) ->
-                    fsInteractor.createTextAsInput(
-                            inputFile = fsSourcePath.inputSource(),
-                            text = textSection,
-                            encoding = Consts.ENCODING
-                    ).map { index to it }
-                }.flatMapSingle { (index, _) ->
-                    runner.run(id = targetId)
-                            .map { index to it }
-                }.flatMapSingle { (index, formatFiles) ->
-                    fsInteractor.extractToOutputDir(
-                            id = targetId,
-                            fileIndex = index,
-                            files = formatFiles
-                    )
-                }
-        val streamCombineAudio: Single<List<File>> = audioFileCombiner.combineAudioFiles(id = targetId)
-                .flatMap { audioFileCombiner.convertWavToMp3(id = targetId) }
-                .flatMap { Single.just(fsSourcePath.outputFilesById(id = targetId)) }
-        val outputFiles: List<File> = streamCleanUp
-                .andThen(streamConvertText)
+        val outputFiles: List<File> = convertInteractor.streamCleanUp()
+                .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
                 .toList()
-                .flatMap { streamCombineAudio }
+                .flatMap { convertInteractor.streamCombineAudio(targetId) }
                 .blockingGet()
         if (outputFiles.isNotEmpty()) {
             return ResponseOutput(

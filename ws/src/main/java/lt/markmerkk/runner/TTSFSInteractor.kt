@@ -6,9 +6,6 @@ import lt.markmerkk.TimeProvider
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.attribute.BasicFileAttributes
-import java.time.LocalDateTime
 
 class TTSFSInteractor(
         private val sourcePath: FSSourcePath,
@@ -34,6 +31,16 @@ class TTSFSInteractor(
                 it.deleteRecursively()
             }
             Completable.complete()
+        }
+    }
+
+    fun cleanToRootAudioOnly(id: String): Single<List<File>> {
+        return Single.defer {
+            val rootAudio = sourcePath.rootAudioById(id)
+            sourcePath.outputFilesById(id)
+                    .filterNot { it.absolutePath == rootAudio.absolutePath }
+                    .forEach { it.delete() }
+            Single.just(sourcePath.outputFilesById(id))
         }
     }
 

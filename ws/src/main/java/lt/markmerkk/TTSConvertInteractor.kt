@@ -1,0 +1,53 @@
+package lt.markmerkk
+
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import lt.markmerkk.runner.*
+import java.io.File
+
+class TTSConvertInteractor(
+        private val fsInteractor: TTSFSInteractor,
+        private val textInteractor: TTSTextInteractor,
+        private val audioFileCombiner: TTSAudioFileCombiner,
+        private val runner: ConvertProcessRunner,
+        private val fsSourcePath: FSSourcePath
+) {
+
+    fun streamCleanUp(): Completable {
+        return fsInteractor.cleanUpFormatter()
+    }
+
+    fun streamConvert(
+            id: String,
+            text: String
+    ): Flowable<List<File>> {
+        val inputAsTextSections = textInteractor.split(text)
+        val indexTextSections: List<Pair<Int, String>> = inputAsTextSections
+                .mapIndexed { index, s -> index to s }
+        return Flowable.fromIterable(indexTextSections)
+                .flatMapSingle { (index, textSection) ->
+                    fsInteractor.createTextAsInput(
+                            inputFile = fsSourcePath.inputSource(),
+                            text = textSection,
+                            encoding = Consts.ENCODING
+                    ).map { index to it }
+                }.flatMapSingle { (index, _) ->
+                    runner.run(id = id)
+                            .map { index to it }
+                }.flatMapSingle { (index, formatFiles) ->
+                    fsInteractor.extractToOutputDir(
+                            id = id,
+                            fileIndex = index,
+                            files = formatFiles
+                    )
+                }
+    }
+
+    fun streamCombineAudio(id: String): Single<List<File>> {
+        return audioFileCombiner.combineAudioFiles(id = id)
+                .flatMap { audioFileCombiner.convertWavToMp3(id = id) }
+                .flatMap { fsInteractor.cleanToRootAudioOnly(id = id) }
+    }
+
+}

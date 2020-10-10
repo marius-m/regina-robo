@@ -36,8 +36,8 @@ class TTSAudioFileCombiner(
     fun convertWavToMp3(id: String): Single<File> {
         return Single.defer {
             try {
-                val rootFile = fsSourcePath.mergeAudioRootById(id)
-                val targetFile = File(fsSourcePath.outputDirById(id), "root.mp3")
+                val rootFile = fsSourcePath.rootAudioByIdTmp(id)
+                val targetFile = fsSourcePath.rootAudioById(id)
                 encoder.encode(MultimediaObject(rootFile), targetFile, encodingAttrs)
                 Single.just(targetFile)
             } catch (ex: Exception) {
@@ -70,7 +70,7 @@ class TTSAudioFileCombiner(
         val audioWavsNames = audioWavs.map { it.name }
         logger.debug("Files for merging: $audioWavsNames")
         val workingDir = fsSourcePath.outputDirById(id)
-        val root = fsSourcePath.mergeAudioRootById(id)
+        val root = fsSourcePath.rootAudioByIdTmp(id)
         for (audioToMerge in audioWavs) {
             logger.debug("Merging ${audioToMerge.name} to ${root.name}")
             combineWavs(workingDir, root, audioToMerge)
