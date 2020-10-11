@@ -54,12 +54,16 @@ class TTSConvertInteractor(
     fun streamRecordConfig(
             id: String,
             fetchTime: LocalDateTime,
-            text: String
+            text: String,
+            isStatusOk: Boolean,
+            statusMessage: String
     ): Single<File> {
         val record = TTSRecordConfig(
                 id = id,
                 fetchDateTime = fetchTime,
-                text = text
+                text = text,
+                isStatusOk = isStatusOk,
+                statusMessage = statusMessage
         )
         return fsInteractor.recordConfig(id, record)
     }

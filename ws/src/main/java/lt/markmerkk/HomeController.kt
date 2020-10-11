@@ -64,7 +64,15 @@ class HomeController(
                 .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
                 .toList()
                 .flatMap { convertInteractor.streamCombineAudio(targetId) }
-                .flatMap { convertInteractor.streamRecordConfig(targetId, now, inputRequest.inputText) }
+                .flatMap {
+                    convertInteractor.streamRecordConfig(
+                            id = targetId,
+                            fetchTime = now,
+                            text = inputRequest.inputText,
+                            isStatusOk = true,
+                            statusMessage = "Success"
+                    )
+                }
                 .flatMap { Single.just(fsSourcePath.outputFilesById(targetId)) }
                 .blockingGet()
         sw.stop()

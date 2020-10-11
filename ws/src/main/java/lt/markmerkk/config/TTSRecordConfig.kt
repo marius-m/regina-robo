@@ -12,14 +12,18 @@ import java.util.*
 data class TTSRecordConfig(
         val fetchDateTime: LocalDateTime,
         val id: String,
-        val text: String
+        val text: String,
+        val isStatusOk: Boolean,
+        val statusMessage: String
 ) {
 
     fun toMap(): Map<String, String> {
         return mapOf(
                 KEY_FETCH_DATESTAMP to dateTimeFormatter.format(fetchDateTime),
                 KEY_ID to id,
-                KEY_TEXT to Base64Utils.encodeToString(text.toByteArray())
+                KEY_TEXT to Base64Utils.encodeToString(text.toByteArray()),
+                KEY_IS_STATUS_OK to isStatusOk.toString(),
+                KEY_STATUS_MESSAGE to Base64Utils.encodeToString(statusMessage.toByteArray())
         )
     }
 
@@ -29,10 +33,14 @@ data class TTSRecordConfig(
         const val KEY_FETCH_DATESTAMP = "fetchDateStamp"
         const val KEY_ID = "id"
         const val KEY_TEXT = "text"
+        const val KEY_IS_STATUS_OK = "status"
+        const val KEY_STATUS_MESSAGE = "status_message"
         private val mandatoryKeys = listOf(
                 KEY_FETCH_DATESTAMP,
                 KEY_ID,
-                KEY_TEXT
+                KEY_TEXT,
+                KEY_IS_STATUS_OK,
+                KEY_STATUS_MESSAGE
         )
 
         fun fromProperties(properties: Properties?): TTSRecordConfig? {
@@ -42,15 +50,19 @@ data class TTSRecordConfig(
                 val missingKeys = mandatoryKeys
                         .filter { !properties.keys.contains(it) }
                 logger.warn("Properties file does not contain all mandatory keys." +
-                        " Mandataroy $mandatoryKeys / Missing: $missingKeys")
+                        " Mandatory $mandatoryKeys / Missing: $missingKeys")
                 return null
             }
             val fetchDateTime = LocalDateTime.parse(properties.getProperty(KEY_FETCH_DATESTAMP), dateTimeFormatter)
             val text = String(Base64Utils.decodeFromString(properties.getProperty(KEY_TEXT)))
+            val isStatusOk: Boolean = properties.getProperty(KEY_IS_STATUS_OK)?.toBoolean() ?: false
+            val statusMessage = String(Base64Utils.decodeFromString(properties.getProperty(KEY_STATUS_MESSAGE)))
             return TTSRecordConfig(
                     fetchDateTime = fetchDateTime,
                     id = properties.getProperty(KEY_ID),
-                    text = text
+                    text = text,
+                    isStatusOk = isStatusOk,
+                    statusMessage = statusMessage
             )
         }
 
