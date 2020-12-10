@@ -19,9 +19,14 @@ open class RBProcessing(
     @RabbitListener(queues = [RabbitConfig.queueNameConvert])
     fun receiveMessage(input: String) {
         try {
-            val inputAsRequest = objectMapper.readValue(input, RequestInput::class.java) // todo defend agains this
+            val inputAsRequest: Map<String, Any?> = objectMapper.readValue(input, Map::class.java) as Map<String, Any?>
+            val inputText: String = extractFromMap(inputAsRequest)
+            if (inputText.isEmpty()) {
+                l.warn("No 'text' found in '${inputAsRequest}'")
+                return
+            }
             l.info("Processing input: $input")
-            val convertResult = converter.processRun(inputAsRequest)
+            val convertResult = converter.processRun(RequestInput(inputText), sanitizeInput(inputAsRequest))
             l.info("Complete! $convertResult")
             rabbitTemplate.convertAndSend(
                     RabbitConfig.exchangeName,
@@ -31,6 +36,17 @@ open class RBProcessing(
         } catch (e: IllegalStateException) {
             l.warn("Error converting", e)
         }
+    }
+
+    fun sanitizeInput(map: Map<String, Any?>): Map<String, Any> {
+        return map.filter { it.value != null }
+                .map { it.key to it.value!! }
+                .toMap()
+    }
+
+    // todo create more defensive method
+    fun extractFromMap(map: Map<String, Any?>): String {
+        return map.getOrDefault("text", "").toString()
     }
 
     companion object {

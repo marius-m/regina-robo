@@ -22,7 +22,8 @@ class Converter(
 
     @Throws(IllegalStateException::class)
     fun processRun(
-            inputRequest: RequestInput
+            inputRequest: RequestInput,
+            extra: Map<String, Any> = emptyMap()
     ): ResponseOutput {
         if (isRunning.get()) {
             throw IllegalStateException("Process already running")
@@ -51,11 +52,11 @@ class Converter(
         val durationMillis = sw.elapsed(TimeUnit.MILLISECONDS)
         if (outputFiles.isNotEmpty()) {
             return ResponseOutput(
-                    requestId = inputRequest.requestId,
                     id = targetId,
                     text = inputRequest.inputText,
                     recordDurationMillis = durationMillis,
-                    resources = outputFiles.asNamedString()
+                    resources = outputFiles.asNamedString(),
+                    extra = extra
             )
         } else {
             throw IllegalStateException("Could not convert")
