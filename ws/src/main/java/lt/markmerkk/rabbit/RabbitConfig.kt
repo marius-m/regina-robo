@@ -1,14 +1,12 @@
 package lt.markmerkk.rabbit
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import lt.markmerkk.Converter
-import lt.markmerkk.entities.RequestInput
 import org.slf4j.LoggerFactory
-import org.springframework.amqp.core.*
-import org.springframework.amqp.rabbit.annotation.RabbitListener
+import org.springframework.amqp.core.BindingBuilder
+import org.springframework.amqp.core.Declarables
+import org.springframework.amqp.core.Queue
+import org.springframework.amqp.core.TopicExchange
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -30,7 +28,8 @@ open class RabbitConfig {
 
     @Bean
     open fun queBindings(): Declarables {
-        val queue1 = Queue(queueNameConvert, false)
+        val args = mapOf<String, Any>("x-max-priority" to 10)
+        val queue1 = Queue(queueNameConvert, false, false, false, args)
         val queue2 = Queue(queueNameResult, false)
         val topicExchange = TopicExchange(exchangeName)
         return Declarables(
