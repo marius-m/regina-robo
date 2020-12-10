@@ -102,6 +102,22 @@ class DefaultComponents {
         )
     }
 
+    @Bean
+    @Scope("singleton")
+    open fun provideConverter(
+            timeProvider: TimeProvider,
+            uuidGenerator: UUIDGenerator,
+            convertInteractor: TTSConvertInteractor,
+            fsSourcePath: FSSourcePath
+    ): Converter {
+        return Converter(
+                timeProvider,
+                uuidGenerator,
+                convertInteractor,
+                fsSourcePath
+        )
+    }
+
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!
 
 }

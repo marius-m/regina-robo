@@ -10,17 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.io.File
-import java.util.concurrent.TimeUnit
+import java.lang.IllegalStateException
 
 @RestController
 @RequestMapping("/api/")
 class HomeController(
         @Autowired private val fsInteractor: TTSFSInteractor,
         @Autowired private val fsSourcePath: FSSourcePath,
-        @Autowired private val uuidGenerator: UUIDGenerator,
-        @Autowired private val convertInteractor: TTSConvertInteractor,
-        @Autowired private val timeProvider: TimeProvider
+        @Autowired private val converter: Converter
 ) {
 
     @RequestMapping(
@@ -57,34 +54,9 @@ class HomeController(
     fun processRun(
             @RequestBody inputRequest: RequestInput
     ): ResponseOutput {
-        val targetId = uuidGenerator.generate()
-        val now = timeProvider.now()
-        val sw = Stopwatch.createStarted()
-        val outputFiles: List<File> = convertInteractor.streamCleanUp()
-                .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
-                .toList()
-                .flatMap { convertInteractor.streamCombineAudio(targetId) }
-                .flatMap {
-                    convertInteractor.streamRecordConfig(
-                            id = targetId,
-                            fetchTime = now,
-                            text = inputRequest.inputText,
-                            isStatusOk = true,
-                            statusMessage = "Success"
-                    )
-                }
-                .flatMap { Single.just(fsSourcePath.outputFilesById(targetId)) }
-                .blockingGet()
-        sw.stop()
-        val durationMillis = sw.elapsed(TimeUnit.MILLISECONDS)
-        if (outputFiles.isNotEmpty()) {
-            return ResponseOutput(
-                    id = targetId,
-                    text = inputRequest.inputText,
-                    recordDurationMillis = durationMillis,
-                    resources = outputFiles.asNamedString()
-            )
-        } else {
+        try {
+            return converter.processRun(inputRequest)
+        } catch (e: IllegalStateException) {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Was not able to convert!")
         }
     }
