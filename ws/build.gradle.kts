@@ -26,6 +26,7 @@ dependencies {
 
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-data-rest:${Versions.springBoot}")
+    implementation("org.springframework.boot:spring-boot-starter-amqp:${Versions.springBoot}")
 
     // Other
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
