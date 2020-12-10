@@ -1,5 +1,7 @@
 package lt.markmerkk
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import lt.markmerkk.runner.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -116,6 +118,14 @@ class DefaultComponents {
                 convertInteractor,
                 fsSourcePath
         )
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun provideObjectMapper(): ObjectMapper {
+        return ObjectMapper().apply {
+            registerModule(KotlinModule())
+        }
     }
 
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!

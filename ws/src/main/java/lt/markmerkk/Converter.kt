@@ -51,6 +51,7 @@ class Converter(
         val durationMillis = sw.elapsed(TimeUnit.MILLISECONDS)
         if (outputFiles.isNotEmpty()) {
             return ResponseOutput(
+                    requestId = inputRequest.requestId,
                     id = targetId,
                     text = inputRequest.inputText,
                     recordDurationMillis = durationMillis,

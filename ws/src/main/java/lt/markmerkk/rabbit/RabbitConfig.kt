@@ -1,15 +1,14 @@
 package lt.markmerkk.rabbit
 
-import org.apache.tomcat.jni.Buffer.address
-import org.apache.tomcat.jni.User.username
-import org.springframework.amqp.core.Binding
-import org.springframework.amqp.core.BindingBuilder
-import org.springframework.amqp.core.Queue
-import org.springframework.amqp.core.TopicExchange
+import com.fasterxml.jackson.databind.ObjectMapper
+import lt.markmerkk.Converter
+import lt.markmerkk.entities.RequestInput
+import org.slf4j.LoggerFactory
+import org.springframework.amqp.core.*
+import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,27 +17,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @EnableAutoConfiguration
 open class RabbitConfig {
-
-    @Bean
-    open fun queue(): Queue {
-        return Queue(queueName, false)
-    }
-
-    @Bean
-    open fun exchange(): TopicExchange {
-        return TopicExchange(topicExchangeName)
-    }
-
-    @Bean
-    open fun binding(
-            queue: Queue,
-            exchange: TopicExchange
-    ): Binding {
-        return BindingBuilder
-                .bind(queue)
-                .to(exchange)
-                .with("rss.*")
-    }
 
     @Bean
     open fun connectionFactory(): ConnectionFactory {
@@ -51,28 +29,24 @@ open class RabbitConfig {
     }
 
     @Bean
-    open fun container(
-            connectionFactory: ConnectionFactory,
-            listenerAdapter: MessageListenerAdapter
-    ): SimpleMessageListenerContainer {
-        val container = SimpleMessageListenerContainer()
-        container.connectionFactory = connectionFactory
-        container.setQueueNames(queueName)
-        container.setMessageListener(listenerAdapter)
-        container.setPrefetchCount(1)
-        return container
-    }
-
-    @Bean
-    open fun listenerAdapter(
-            receiver: RabbitReceiver
-    ): MessageListenerAdapter {
-        return MessageListenerAdapter(receiver, "receiveMessage")
+    open fun queBindings(): Declarables {
+        val queue1 = Queue(queueNameConvert, false)
+        val queue2 = Queue(queueNameResult, false)
+        val topicExchange = TopicExchange(exchangeName)
+        return Declarables(
+                queue1,
+                queue2,
+                topicExchange,
+                BindingBuilder.bind(queue1).to(topicExchange).with("rss.convert.*"),
+                BindingBuilder.bind(queue2).to(topicExchange).with("rss.result.*")
+        )
     }
 
     companion object {
-        const val queueName = "rss-queue"
-        const val topicExchangeName = "rss-exchange"
+        const val queueNameConvert = "rss-convert"
+        const val queueNameResult = "rss-result"
+        const val exchangeName = "rss-exchange"
+        private val l = LoggerFactory.getLogger(RabbitConfig::class.java.simpleName)!!
     }
 
 }
