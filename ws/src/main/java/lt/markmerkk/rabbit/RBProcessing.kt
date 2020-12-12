@@ -16,11 +16,23 @@ open class RBProcessing(
         @Autowired private val rabbitTemplate: RabbitTemplate
 ) {
 
+    /**
+     * Gets input in form of
+     *
+     *   data class RoboRespProcess(
+     *      val id: String,
+     *      val text: String,
+     *      val recordDurationMillis: Long,
+     *      val resources: List<String>,
+     *      val extra: Map<String, Any?>
+     *   )
+     *
+     */
     @RabbitListener(queues = [RabbitConfig.queueNameConvert])
     fun receiveMessage(input: String) {
         try {
             val inputAsRequest: Map<String, Any?> = objectMapper.readValue(input, Map::class.java) as Map<String, Any?>
-            val inputText: String = extractFromMap(inputAsRequest)
+            val inputText: String = extractFromMapText(inputAsRequest)
             if (inputText.isEmpty()) {
                 l.warn("No 'text' found in '${inputAsRequest}'")
                 return
@@ -45,7 +57,7 @@ open class RBProcessing(
     }
 
     // todo create more defensive method
-    fun extractFromMap(map: Map<String, Any?>): String {
+    fun extractFromMapText(map: Map<String, Any?>): String {
         return map.getOrDefault("text", "").toString()
     }
 
