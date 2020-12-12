@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.util.parseSpaceSeparatedArgs
+import java.util.Properties
 
 plugins {
     application
@@ -8,8 +9,14 @@ plugins {
     id("org.jetbrains.kotlin.plugin.noarg")
 }
 
+val appProps = Properties().apply {
+    file("${projectDir}/src/main/resources/application.properties")
+            .inputStream()
+            .use { load(it) }
+}
+
 group = "lt.markmerkk"
-version = "1.0.0"
+version = appProps.getProperty("version")
 
 repositories {
     mavenCentral()
@@ -27,6 +34,8 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-data-rest:${Versions.springBoot}")
     implementation("org.springframework.boot:spring-boot-starter-amqp:${Versions.springBoot}")
+    implementation("io.sentry:sentry-spring-boot-starter:3.2.0")
+    implementation("io.sentry:sentry-logback:3.2.0")
 
     // Other
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")

@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 
 
 @Configuration
@@ -17,12 +18,20 @@ import org.springframework.context.annotation.Configuration
 open class RabbitConfig {
 
     @Bean
-    open fun connectionFactory(): ConnectionFactory {
+    @Profile("dev")
+    open fun connectionFactoryDev(): ConnectionFactory {
         val connectionFactory = CachingConnectionFactory()
-        //connectionFactory.setAddresses("10.0.1.150:5672")
         connectionFactory.setAddresses("10.0.1.150:5672")
         connectionFactory.username = "test"
         connectionFactory.setPassword("test")
+        return connectionFactory
+    }
+
+    @Bean
+    @Profile("prod")
+    open fun connectionFactoryProd(): ConnectionFactory {
+        val connectionFactory = CachingConnectionFactory()
+        connectionFactory.setAddresses("localhost:5672")
         return connectionFactory
     }
 

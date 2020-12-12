@@ -128,6 +128,18 @@ class DefaultComponents {
         }
     }
 
+    @Bean
+    @Scope("singleton")
+    open fun provideBuildConfig(
+            @Value("\${version}") version: String,
+            @Value("\${sentry.dsn}") sentryDsn: String
+    ): BuildConfig {
+        return BuildConfig(
+                version = version,
+                sentryDsn = sentryDsn
+        )
+    }
+
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!
 
 }
