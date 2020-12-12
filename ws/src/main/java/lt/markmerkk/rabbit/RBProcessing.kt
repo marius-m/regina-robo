@@ -72,7 +72,7 @@ data class InputExtras(
         fun asEmpty(): InputExtras = InputExtras("")
         fun fromMap(extras: Map<String, Any?>): InputExtras {
             val extractExtras = InputExtras(
-                    text = extras.extractOrEmpty("entityId")
+                    text = extras.extractOrEmpty("text")
             )
             if (extractExtras.isEmpty()) {
                 return asEmpty()
