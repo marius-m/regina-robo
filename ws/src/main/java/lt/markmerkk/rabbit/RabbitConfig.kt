@@ -1,5 +1,6 @@
 package lt.markmerkk.rabbit
 
+import lt.markmerkk.RabbitCreds
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.Declarables
@@ -7,6 +8,7 @@ import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,6 +18,8 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @EnableAutoConfiguration
 open class RabbitConfig {
+
+    @Autowired lateinit var rabbitCreds: RabbitCreds
 
     @Bean
     @Profile("dev")
@@ -32,6 +36,8 @@ open class RabbitConfig {
     open fun connectionFactoryProd(): ConnectionFactory {
         val connectionFactory = CachingConnectionFactory()
         connectionFactory.setAddresses("localhost:5672")
+        connectionFactory.username = rabbitCreds.user
+        connectionFactory.setPassword(rabbitCreds.pass)
         return connectionFactory
     }
 

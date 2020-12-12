@@ -140,6 +140,18 @@ class DefaultComponents {
         )
     }
 
+    @Bean
+    @Scope("singleton")
+    open fun provideRabbitCreds(
+            @Value("\${rabbit.user}") user: String,
+            @Value("\${rabbit.pass}") pass: String
+    ): RabbitCreds {
+        return RabbitCreds(
+                user = user,
+                pass = pass
+        )
+    }
+
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!
 
 }
