@@ -1,6 +1,7 @@
 package lt.markmerkk.runner
 
 import io.reactivex.rxjava3.core.Single
+import lt.markmerkk.runner.TTSAudioFileCombiner.Companion.extractSequenceNumberOrZero
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -34,8 +35,8 @@ class TTSAudioFileCombiner(
      */
     private fun combineAudioFilesToOne(id: String, files: List<File>): File {
         logger.debug("--- Combining audio files ---")
-        val audioWavs = extractOnlyAudioWavs(files)
-                .sortedBy { it.name }
+        val audioWavs = files.extractOnlyAudioWavs()
+                .sortByAudioFileIndex()
         val audioWavsNames = audioWavs.map { it.name }
         logger.debug("Files for merging: $audioWavsNames")
         val workingDir = fsSourcePath.outputDirById(id)
@@ -83,12 +84,38 @@ class TTSAudioFileCombiner(
         throw IllegalArgumentException("Error combining audio files")
     }
 
-    private fun extractOnlyAudioWavs(files: List<File>): List<File> {
-        return files.filter { it.absolutePath.endsWith(".wav") }
-    }
-
     companion object {
         private val logger = LoggerFactory.getLogger(TTSAudioFileCombiner::class.java)!!
+
+        private val audioFilePattern = "([0-9]+)([-])".toRegex()
+
+        fun extractSequenceNumberOrZero(audioFileName: String): Int {
+            val match: MatchResult? = audioFilePattern.find(audioFileName)
+            val groupValues: List<String> = match?.groupValues ?: emptyList()
+            if (groupValues.isNotEmpty()) {
+                return groupValues[1].toInt()
+            }
+            return 0
+        }
+
     }
 
+}
+
+fun List<File>.extractOnlyAudioWavs(): List<File> {
+    return this.filter { it.absolutePath.endsWith(".wav") }
+}
+
+/**
+ * Files have a naming pattern '0-pastr_0_0.wav', '1-pastr_0_0.wav'
+ * when naming exceeds 9 files, it would go do double digits.
+ *
+ * This will sort the files properly
+ */
+fun List<File>.sortByAudioFileIndex(): List<File> {
+    val fileByIndexNum: List<Pair<Int, File>> = this
+            .map { extractSequenceNumberOrZero(it.name) to it }
+    return fileByIndexNum
+            .sortedBy { it.first }
+            .map { it.second }
 }

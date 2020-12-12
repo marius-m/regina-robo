@@ -1,7 +1,6 @@
 package lt.markmerkk.rabbit
 
 import org.assertj.core.api.Assertions
-import org.junit.Assert.*
 import org.junit.Test
 
 class InputExtrasTest {
@@ -10,8 +9,7 @@ class InputExtrasTest {
     fun valid() {
         // Assemble
         val inputMap = mapOf<String, Any?>(
-                "entityId" to "123",
-                "textId" to "321"
+                "text" to "123"
         )
 
         // Act
