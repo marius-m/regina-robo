@@ -111,6 +111,12 @@ fun List<File>.extractOnlyAudioWavs(): List<File> {
  * when naming exceeds 9 files, it would go do double digits.
  *
  * This will sort the files properly
+ *
+ * Merging 0-pastr_0_0.wav to record.wav
+ * Root file does not exist, marking file as the first one to be merged
+ * Merging 1-pastr_0_0.wav to record.wav
+ * Merging 2-pastr_0_0.wav to record.wav
+ * Merging 3-pastr_0_0.wav to record.wav
  */
 fun List<File>.sortByAudioFileIndex(): List<File> {
     val fileByIndexNum: List<Pair<Int, File>> = this
