@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
 @RestController
@@ -17,6 +18,16 @@ class HomeController(
         @Autowired private val fsSourcePath: FSSourcePath,
         @Autowired private val converter: Converter
 ) {
+
+    @RequestMapping(
+            value = ["/test-sentry"],
+            method = [RequestMethod.GET],
+            produces = ["application/json"]
+    )
+    @ResponseBody
+    fun test(): HttpStatus {
+        throw IllegalArgumentException("Testing sentry reporting")
+    }
 
     @RequestMapping(
             value = ["/process-clean"],
