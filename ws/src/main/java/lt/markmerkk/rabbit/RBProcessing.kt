@@ -32,13 +32,13 @@ open class RBProcessing(
     fun receiveMessage(input: String) {
         try {
             val inputAsRequest: Map<String, Any?> = objectMapper.readValue(input, Map::class.java) as Map<String, Any?>
-            val inputText: String = extractFromMapText(inputAsRequest)
-            if (inputText.isEmpty()) {
+            val inputExtras: InputExtras = InputExtras.fromMap(inputAsRequest)
+            if (inputExtras.isEmpty()) {
                 l.warn("No 'text' found in '${inputAsRequest}'")
                 return
             }
             l.info("Processing input: $input")
-            val convertResult = converter.processRun(RequestInput(inputText), sanitizeInput(inputAsRequest))
+            val convertResult = converter.processRun(RequestInput(inputExtras.text), sanitizeInput(inputAsRequest))
             l.info("Complete! $convertResult")
             rabbitTemplate.convertAndSend(
                     RabbitConfig.exchangeName,
@@ -56,13 +56,40 @@ open class RBProcessing(
                 .toMap()
     }
 
-    // todo create more defensive method
-    fun extractFromMapText(map: Map<String, Any?>): String {
-        return map.getOrDefault("text", "").toString()
-    }
-
     companion object {
         private val l = LoggerFactory.getLogger(RBProcessing::class.java.simpleName)!!
     }
 
 }
+
+data class InputExtras(
+        val text: String
+) {
+
+    fun isEmpty(): Boolean = text.isEmpty()
+
+    companion object {
+        fun asEmpty(): InputExtras = InputExtras("")
+        fun fromMap(extras: Map<String, Any?>): InputExtras {
+            val extractExtras = InputExtras(
+                    text = extras.extractOrEmpty("entityId")
+            )
+            if (extractExtras.isEmpty()) {
+                return asEmpty()
+            }
+            return extractExtras
+        }
+    }
+}
+
+fun Map<String, Any?>.extractOrEmpty(key: String): String {
+    if (!containsKey(key)) {
+        return ""
+    }
+    val value: String = getValue(key).toString()
+    return when {
+        value != "null" -> value
+        else -> ""
+    }
+}
+
