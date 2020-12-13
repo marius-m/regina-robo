@@ -37,7 +37,7 @@ open class RBProcessing(
                 l.warn("No 'text' found in '${inputAsRequest}'")
                 return
             }
-            l.info("Processing input: $input")
+            l.info("Processing input")
             val convertResult = converter.processRun(RequestInput(inputExtras.text), sanitizeInput(inputAsRequest))
             l.info("Complete! $convertResult")
             rabbitTemplate.convertAndSend(

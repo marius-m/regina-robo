@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.SequenceInputStream
+import java.lang.IllegalStateException
 import javax.sound.sampled.AudioFileFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem

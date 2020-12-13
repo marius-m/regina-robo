@@ -47,6 +47,7 @@ class Converter(
                     )
                 }
                 .flatMap { Single.just(fsSourcePath.outputFilesById(targetId)) }
+                .doOnError { isRunning.set(false) }
                 .blockingGet()
         sw.stop()
         isRunning.set(false)
