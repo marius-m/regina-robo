@@ -99,7 +99,7 @@ class FSSourcePath(
 
     companion object {
         private val logger = LoggerFactory.getLogger(FSSourcePath::class.java)!!
-        private val TIME_LIMIT_MINUTES = 3 * 60 // 3 hours
+        private val TIME_LIMIT_MINUTES = 5 // 5 minutes
 
         // 3 hours = 60 * 3
         fun isFileOld(fileCreateTime: LocalDateTime, now: LocalDateTime): Boolean {

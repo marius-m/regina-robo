@@ -31,7 +31,7 @@ class SchedulerConfig(
         }
     }
 
-    @Scheduled(fixedDelay = MINUTE * 30)
+    @Scheduled(fixedDelay = MINUTE * 5)
     fun scheduleCleanOutput() {
         fsInteractor.cleanUpOutput(fsSourcePath.outputFilesOld())
                 .subscribe()
