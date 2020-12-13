@@ -29,19 +29,30 @@ class ConvertProcessRunnerImpl(
             val process = ProcessBuilder("wine", fsRunnerPath.toolFile.absolutePath)
                     .directory(fsRunnerPath.toolDir)
                     .start()
-            printStream("IS", process.inputStream)
-            printStream("Error", process.errorStream)
+            printInputStream("IS", process.inputStream)
+            printErrorStream("Error", process.errorStream)
             Single.just(fsSourcePath.formatterFiles())
         }
     }
 
-    private fun printStream(prefix: String, inputStream: InputStream) {
+    private fun printInputStream(prefix: String, inputStream: InputStream) {
         val isr = InputStreamReader(inputStream)
         val br = BufferedReader(isr)
 
         var output = br.readLine()
         while (output != null) {
             logger.debug("$prefix: $output")
+            output = br.readLine()
+        }
+    }
+
+    private fun printErrorStream(prefix: String, inputStream: InputStream) {
+        val isr = InputStreamReader(inputStream)
+        val br = BufferedReader(isr)
+
+        var output = br.readLine()
+        while (output != null) {
+            logger.warn("$prefix: $output")
             output = br.readLine()
         }
     }
