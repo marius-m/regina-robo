@@ -15,7 +15,8 @@ class Converter(
         private val timeProvider: TimeProvider,
         private val uuidGenerator: UUIDGenerator,
         private val convertInteractor: TTSConvertInteractor,
-        private val fsSourcePath: FSSourcePath
+        private val fsSourcePath: FSSourcePath,
+        private val buildConfig: BuildConfig
 ) {
 
     private val isRunning = AtomicBoolean(false)
@@ -52,6 +53,7 @@ class Converter(
         val durationMillis = sw.elapsed(TimeUnit.MILLISECONDS)
         if (outputFiles.isNotEmpty()) {
             return ResponseOutput(
+                    resourceBasePath = buildConfig.resourceBasePath,
                     id = targetId,
                     text = inputRequest.inputText,
                     recordDurationMillis = durationMillis,

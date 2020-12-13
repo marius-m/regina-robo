@@ -5,9 +5,10 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import lt.markmerkk.runner.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Profile
 import org.springframework.context.annotation.Scope
+import org.springframework.core.env.Environment
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 import java.io.File
@@ -110,13 +111,15 @@ class DefaultComponents {
             timeProvider: TimeProvider,
             uuidGenerator: UUIDGenerator,
             convertInteractor: TTSConvertInteractor,
-            fsSourcePath: FSSourcePath
+            fsSourcePath: FSSourcePath,
+            buildConfig: BuildConfig
     ): Converter {
         return Converter(
                 timeProvider,
                 uuidGenerator,
                 convertInteractor,
-                fsSourcePath
+                fsSourcePath,
+                buildConfig
         )
     }
 
@@ -132,10 +135,14 @@ class DefaultComponents {
     @Scope("singleton")
     open fun provideBuildConfig(
             @Value("\${version}") version: String,
-            @Value("\${sentry.dsn}") sentryDsn: String
+            @Value("\${sentry.dsn}") sentryDsn: String,
+            environment: Environment,
+            serverProperties: ServerProperties
     ): BuildConfig {
         return BuildConfig(
                 version = version,
+                serverPort = serverProperties.port.toString(),
+                serverProfiles = environment.activeProfiles.toList(),
                 sentryDsn = sentryDsn
         )
     }

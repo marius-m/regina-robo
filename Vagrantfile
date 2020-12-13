@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "ws/build/libs", "/home/vagrant/spring"
 
-  config.vm.network "forwarded_port", guest: 8080, host: 8082
+  config.vm.network "forwarded_port", guest: 8082, host: 8082
   #config.vm.network "forwarded_port", guest: 5672, host: 5672
   #config.vm.network "private_network", ip: "192.168.10.192"
 
