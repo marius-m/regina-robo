@@ -34,6 +34,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-data-rest:${Versions.springBoot}")
     implementation("org.springframework.boot:spring-boot-starter-amqp:${Versions.springBoot}")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:${Versions.springBoot}")
     implementation("io.sentry:sentry-spring-boot-starter:3.2.0")
     implementation("io.sentry:sentry-logback:3.2.0")
 
