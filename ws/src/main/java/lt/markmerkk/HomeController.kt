@@ -5,9 +5,16 @@ import lt.markmerkk.entities.ResponseOutput
 import lt.markmerkk.runner.*
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.InputStreamResource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.io.FileInputStream
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
@@ -16,7 +23,8 @@ import java.lang.IllegalStateException
 class HomeController(
         @Autowired private val fsInteractor: TTSFSInteractor,
         @Autowired private val fsSourcePath: FSSourcePath,
-        @Autowired private val converter: Converter
+        @Autowired private val converter: Converter,
+        @Autowired private val resourceLoader: ResourceLoader
 ) {
 
     @RequestMapping(
@@ -79,14 +87,19 @@ class HomeController(
     fun fetchOutput(
             @PathVariable("id") id: String,
             @PathVariable("fileName") fileName: String
-    ): ByteArray {
+    ): ResponseEntity<Resource> {
         if (!fsSourcePath.hasOutputById(id)) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found")
         }
         val outputFile = fsSourcePath.outputFilesById(id)
                 .firstOrNull { it.name == fileName }
         if (outputFile != null) {
-            return FileUtils.readFileToByteArray(outputFile)
+            val resource = InputStreamResource(FileInputStream(outputFile))
+            return ResponseEntity.ok()
+                    .contentLength(outputFile.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${outputFile.name}\"")
+                    .body(resource)
         } else {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found")
         }

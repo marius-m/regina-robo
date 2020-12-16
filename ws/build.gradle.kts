@@ -35,14 +35,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-rest:${Versions.springBoot}")
     implementation("org.springframework.boot:spring-boot-starter-amqp:${Versions.springBoot}")
     implementation("org.springframework.boot:spring-boot-starter-actuator:${Versions.springBoot}")
-    implementation("io.sentry:sentry-spring-boot-starter:3.2.0")
-    implementation("io.sentry:sentry-logback:3.2.0")
 
     // Other
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
     implementation("commons-io:commons-io:2.5")
     implementation("com.google.guava:guava:29.0-jre")
     implementation("io.reactivex.rxjava3:rxjava:3.0.6")
+    implementation("io.sentry:sentry-spring-boot-starter:3.2.0")
+    implementation("io.sentry:sentry-logback:3.2.0")
+    implementation("ws.schild:jave-core:3.0.1")
+    implementation("ws.schild:jave-all-deps:3.0.1")
+    implementation("ws.schild:jave-nativebin-linux64:3.0.1")
 
     // Monitoring
     implementation("org.slf4j:slf4j-api:1.7.27")

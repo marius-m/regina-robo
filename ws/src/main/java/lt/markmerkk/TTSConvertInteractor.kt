@@ -12,6 +12,7 @@ class TTSConvertInteractor(
         private val fsInteractor: TTSFSInteractor,
         private val textInteractor: TTSTextInteractor,
         private val audioFileCombiner: TTSAudioFileCombiner,
+        private val audioConverterMp3: TTSAudioConverterMp3,
         private val runner: ConvertProcessRunner,
         private val fsSourcePath: FSSourcePath
 ) {
@@ -49,6 +50,10 @@ class TTSConvertInteractor(
     fun streamCombineAudio(id: String): Single<List<File>> {
         return audioFileCombiner.combineAudioFiles(id = id)
                 .flatMap { fsInteractor.cleanToRootAudioOnly(id = id) }
+    }
+
+    fun streamConvertMp3(id: String): Single<List<File>> {
+        return audioConverterMp3.convertToMp3(id = id)
     }
 
     fun streamRecordConfig(

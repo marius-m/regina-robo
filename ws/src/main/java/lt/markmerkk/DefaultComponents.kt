@@ -63,6 +63,15 @@ class DefaultComponents {
 
     @Bean
     @Scope("singleton")
+    open fun provideAudioConverterMp3(
+            fsSourcePath: FSSourcePath
+    ): TTSAudioConverterMp3 {
+        return TTSAudioConverterMp3(fsSourcePath)
+    }
+
+
+    @Bean
+    @Scope("singleton")
     open fun provideTextInteractor(): TTSTextInteractor {
         return TTSTextInteractor(maxSymbolsPerSection = TTSTextInteractor.DEFAULT_MAX_SYMBOLS)
     }
@@ -84,6 +93,7 @@ class DefaultComponents {
             fsSourcePath: FSSourcePath,
             fsInteractor: TTSFSInteractor,
             audioFileCombiner: TTSAudioFileCombiner,
+            audioConverterMp3: TTSAudioConverterMp3,
             textInteractor: TTSTextInteractor,
             convertProcessRunner: ConvertProcessRunner
     ): TTSConvertInteractor {
@@ -91,6 +101,7 @@ class DefaultComponents {
                 fsInteractor,
                 textInteractor,
                 audioFileCombiner,
+                audioConverterMp3,
                 convertProcessRunner,
                 fsSourcePath
         )

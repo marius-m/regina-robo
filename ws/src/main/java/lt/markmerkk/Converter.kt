@@ -37,6 +37,7 @@ class Converter(
                 .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
                 .toList()
                 .flatMap { convertInteractor.streamCombineAudio(targetId) }
+                .flatMap { convertInteractor.streamConvertMp3(targetId) }
                 .flatMap {
                     convertInteractor.streamRecordConfig(
                             id = targetId,

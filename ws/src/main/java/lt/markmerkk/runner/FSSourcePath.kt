@@ -112,12 +112,21 @@ class FSSourcePath(
 class FormatterOutputFilter: FilenameFilter {
     override fun accept(dir: File, name: String): Boolean {
         return name.startsWith(Consts.OUTPUT_PREFIX)
-                && (name.endsWith(Consts.OUTPUT_EXTENSION_TXT) || name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO))
+                && (name.endsWith(Consts.OUTPUT_EXTENSION_TXT) || name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO_WAV))
                 || name == Consts.INPUT_FILENAME
                 || name == Consts.INPUT_FILENAME_ENCODED
     }
 }
 
 fun List<File>.onlyExisting(): List<File> = filter { it.exists() }
-fun List<File>.onlyAudio(): List<File> = filter { it.name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO) }
+fun List<File>.onlyAudioWav(): List<File> = filter {
+    it.name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO_WAV)
+}
+fun List<File>.onlyAudioMp3(): List<File> = filter {
+    it.name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO_MP3)
+}
+fun List<File>.onlyAudio(): List<File> = filter {
+    it.name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO_WAV)
+            || it.name.endsWith(Consts.OUTPUT_EXTENSION_AUDIO_MP3)
+}
 fun List<File>.asNamedString(): List<String> = map { it.name }

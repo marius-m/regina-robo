@@ -4,7 +4,8 @@ object Consts {
     const val NO_ID = -1L
     const val OUTPUT_PREFIX = "pastr_"
     const val OUTPUT_EXTENSION_TXT = ".txt"
-    const val OUTPUT_EXTENSION_AUDIO = ".wav"
+    const val OUTPUT_EXTENSION_AUDIO_WAV = ".wav"
+    const val OUTPUT_EXTENSION_AUDIO_MP3 = ".mp3"
     const val OUTPUT_EXTENSION_PROPERTIES = ".properties"
     const val INPUT_FILENAME = "duom-utf8.txt"
     const val INPUT_FILENAME_ENCODED = "duom.txt"
