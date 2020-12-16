@@ -2,10 +2,10 @@ package lt.markmerkk.runner
 
 import io.reactivex.rxjava3.core.Single
 import org.slf4j.LoggerFactory
+import ws.schild.jave.AudioAttributes
 import ws.schild.jave.Encoder
+import ws.schild.jave.EncodingAttributes
 import ws.schild.jave.MultimediaObject
-import ws.schild.jave.encode.AudioAttributes
-import ws.schild.jave.encode.EncodingAttributes
 import java.io.File
 
 class TTSAudioConverterMp3(
@@ -53,9 +53,8 @@ class TTSAudioConverterMp3(
                 setSamplingRate(44100)
             }
             val attrs = EncodingAttributes().apply {
-                setInputFormat("wav")
-                setOutputFormat("mp3")
-                setAudioAttributes(audio)
+                format = "mp3"
+                audioAttributes = audio
             }
             encoder.encode(MultimediaObject(source), target, attrs)
             target
@@ -64,6 +63,31 @@ class TTSAudioConverterMp3(
             null
         }
     }
+
+    // 3.0.1
+//    private fun convertAudioFile(
+//            source: File,
+//            target: File
+//    ): File? {
+//        return try {
+//            val audio = AudioAttributes().apply {
+//                setCodec("libmp3lame")
+//                setBitRate(128000)
+//                setChannels(2)
+//                setSamplingRate(44100)
+//            }
+//            val attrs = EncodingAttributes().apply {
+//                setInputFormat("wav")
+//                setOutputFormat("mp3")
+//                setAudioAttributes(audio)
+//            }
+//            encoder.encode(MultimediaObject(source), target, attrs)
+//            target
+//        } catch (ex: Exception) {
+//            logger.warn("Was not able to convert to mp3", ex)
+//            null
+//        }
+//    }
 
     companion object {
         private val logger = LoggerFactory.getLogger(TTSAudioConverterMp3::class.java)!!
