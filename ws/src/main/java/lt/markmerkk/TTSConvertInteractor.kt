@@ -25,7 +25,9 @@ class TTSConvertInteractor(
             id: String,
             text: String
     ): Flowable<List<File>> {
-        val inputAsTextSections = textInteractor.split(text)
+        val inputAsTextSections = textInteractor
+                .split(text)
+                .map { it.replaceInvalidCharacters() }
         val indexTextSections: List<Pair<Int, String>> = inputAsTextSections
                 .mapIndexed { index, s -> index to s }
         return Flowable.fromIterable(indexTextSections)

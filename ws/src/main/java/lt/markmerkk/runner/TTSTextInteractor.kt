@@ -37,8 +37,15 @@ class TTSTextInteractor(
         return textInSections.toList()
     }
 
+
     companion object {
         const val DEFAULT_MAX_SYMBOLS = 400
     }
 
+}
+
+fun String.replaceInvalidCharacters(): String {
+    return this
+            .replace("„", "\"")
+            .replace("“", "\"")
 }

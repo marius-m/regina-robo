@@ -37,7 +37,7 @@ class Converter(
                 .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
                 .toList()
                 .flatMap { convertInteractor.streamCombineAudio(targetId) }
-                .flatMap { convertInteractor.streamConvertMp3(targetId) }
+//                .flatMap { convertInteractor.streamConvertMp3(targetId) } // ExoPlayer on device does not support it
                 .flatMap {
                     convertInteractor.streamRecordConfig(
                             id = targetId,
