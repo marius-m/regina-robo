@@ -47,10 +47,10 @@ class ConvertProcessRunnerImpl(
             val errorResponse = extractInputStream(process.errorStream)
             logger.debug("--- IS ---")
             logger.debug(inputResponse.joinToString("\n"))
-            if (!isExitNoError || errorResponse.isNotEmpty()) {
+            logger.debug("--- ES ---")
+            logger.debug(errorResponse.joinToString("\n"))
+            if (!isExitNoError) {
                 logger.warn("Process either did not finish or hard errors!")
-                logger.debug("--- ES ---")
-                logger.debug(errorResponse.joinToString("\n"))
                 Single.error<List<File>>(IllegalStateException("Did not exit with regular process finish"))
             } else {
                 logger.debug("Process end (${sw.asMillis()})")

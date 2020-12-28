@@ -25,7 +25,8 @@ open class RabbitConfig {
     @Profile("dev")
     open fun connectionFactoryDev(): ConnectionFactory {
         val connectionFactory = CachingConnectionFactory()
-        connectionFactory.setAddresses("10.0.1.150:5672")
+        //connectionFactory.setAddresses("10.0.1.150:5672")
+        connectionFactory.setAddresses("192.168.1.242:5672")
         connectionFactory.username = "test"
         connectionFactory.setPassword("test")
         return connectionFactory
