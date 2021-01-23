@@ -51,10 +51,10 @@ class ConvertProcessRunnerImpl(
             logger.debug("Starting process (${sw.asMillis()})")
             val process = ProcessBuilder("wine", fsRunnerPath.toolFile.absolutePath)
                     .directory(fsRunnerPath.toolDir)
+                    .redirectErrorStream(true)
                     .start()
             dispTimeout = inspectProcessForTimeout(process)
             dispInput = inspectInputStream("I", process.inputStream)
-            dispError = inspectInputStream("E", process.errorStream)
             logger.debug("Scheduling EXIT timeout '${PROCESS_TIMEOUT_SECONDS}' (${sw.asMillis()})")
             val isExitNoError = process.waitFor(PROCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             if (!isExitNoError) {

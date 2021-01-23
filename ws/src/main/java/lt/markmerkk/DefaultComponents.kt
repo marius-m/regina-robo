@@ -73,7 +73,7 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideTextInteractor(): TTSTextInteractor {
-        return TTSTextInteractor(maxSymbolsPerSection = TTSTextInteractor.DEFAULT_MAX_SYMBOLS)
+        return TTSTextInteractor(maxSymbolsPerSection = TTSTextInteractor.DEFAULT_MAX_SYMBOLS_PER_SECTION)
     }
 
     @Bean
