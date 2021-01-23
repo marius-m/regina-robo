@@ -10,9 +10,9 @@ import java.time.*
 class FSSourcePathIsFileOldTest {
 
     @Test
-    fun oneHourPass() {
+    fun minutePass3() {
         // Assemble
-        val now = LocalDateTime.of(1970, 1, 1, 10, 0)
+        val now = LocalDateTime.of(1970, 1, 1, 9, 3)
         val fileCreateTime = LocalDateTime.of(1970, 1, 1, 9, 0)
 
         // Act

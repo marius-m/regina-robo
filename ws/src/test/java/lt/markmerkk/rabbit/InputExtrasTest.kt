@@ -9,7 +9,9 @@ class InputExtrasTest {
     fun valid() {
         // Assemble
         val inputMap = mapOf<String, Any?>(
-                "text" to "123"
+                "text" to "123",
+                "entityId" to "asdf1",
+                "textId" to "asdf2"
         )
 
         // Act
@@ -17,7 +19,33 @@ class InputExtrasTest {
 
         // Assert
         Assertions.assertThat(result).isEqualTo(
-                InputExtras(text = "123")
+                InputExtras(
+                        text = "123",
+                        extraEntityId = "asdf1",
+                        extraTextId = "asdf2"
+                )
+        )
+    }
+
+    @Test
+    fun noExtras() {
+        // Assemble
+        val inputMap = mapOf<String, Any?>(
+                "text" to "123"
+//                "entityId" to "asdf1",
+//                "textId" to "asdf2"
+        )
+
+        // Act
+        val result = InputExtras.fromMap(inputMap)
+
+        // Assert
+        Assertions.assertThat(result).isEqualTo(
+                InputExtras(
+                        text = "123",
+                        extraEntityId = "",
+                        extraTextId = ""
+                )
         )
     }
 

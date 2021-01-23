@@ -34,7 +34,7 @@ class Converter(
         val now = timeProvider.now()
         val sw = Stopwatch.createStarted()
         val outputFiles: List<File> = convertInteractor.streamCleanUp()
-                .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText))
+                .andThen(convertInteractor.streamConvert(targetId, inputRequest.inputText, inputRequest.asMap()))
                 .toList()
                 .flatMap { convertInteractor.streamCombineAudio(targetId) }
 //                .flatMap { convertInteractor.streamConvertMp3(targetId) } // ExoPlayer on device does not support it

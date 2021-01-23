@@ -23,7 +23,8 @@ class TTSConvertInteractor(
 
     fun streamConvert(
             id: String,
-            text: String
+            text: String,
+            extras: Map<String, String>
     ): Flowable<List<File>> {
         val inputAsTextSections = textInteractor
                 .split(text)
@@ -38,7 +39,7 @@ class TTSConvertInteractor(
                             encoding = Consts.ENCODING
                     ).map { index to it }
                 }.flatMapSingle { (index, _) ->
-                    runner.run(id = id)
+                    runner.run(id = id, extras = extras)
                             .map { index to it }
                 }.flatMapSingle { (index, formatFiles) ->
                     fsInteractor.extractToOutputDir(

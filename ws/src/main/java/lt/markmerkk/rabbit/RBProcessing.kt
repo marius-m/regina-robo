@@ -38,7 +38,14 @@ open class RBProcessing(
                 return
             }
             l.info("Processing input")
-            val convertResult = converter.processRun(RequestInput(inputExtras.text), sanitizeInput(inputAsRequest))
+            val convertResult = converter.processRun(
+                    RequestInput(
+                            inputText = inputExtras.text,
+                            extraEntityId = inputExtras.extraEntityId,
+                            extraTextId = inputExtras.extraTextId
+                    ),
+                    sanitizeInput(inputAsRequest)
+            )
             l.info("Complete! $convertResult")
             rabbitTemplate.convertAndSend(
                     RabbitConfig.exchangeName,
@@ -63,16 +70,20 @@ open class RBProcessing(
 }
 
 data class InputExtras(
-        val text: String
+        val text: String,
+        val extraEntityId: String,
+        val extraTextId: String
 ) {
 
     fun isEmpty(): Boolean = text.isEmpty()
 
     companion object {
-        fun asEmpty(): InputExtras = InputExtras("")
+        fun asEmpty(): InputExtras = InputExtras("", "", "")
         fun fromMap(extras: Map<String, Any?>): InputExtras {
             val extractExtras = InputExtras(
-                    text = extras.extractOrEmpty("text")
+                    text = extras.extractOrEmpty("text"),
+                    extraEntityId = extras.extractOrEmpty("entityId"),
+                    extraTextId = extras.extractOrEmpty("textId")
             )
             if (extractExtras.isEmpty()) {
                 return asEmpty()

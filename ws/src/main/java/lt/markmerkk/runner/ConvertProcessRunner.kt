@@ -11,5 +11,8 @@ interface ConvertProcessRunner {
     /**
      * Runs a conversion process and returns output
      */
-    fun run(id: String): Single<List<File>>
+    fun run(
+            id: String,
+            extras: Map<String, String>
+    ): Single<List<File>>
 }

@@ -29,14 +29,20 @@ class ConvertProcessRunnerImpl(
      *
      * Process regularly takes around 5-10 seconds to finish
      */
-    override fun run(id: String): Single<List<File>> {
+    override fun run(
+            id: String,
+            extras: Map<String, String>
+    ): Single<List<File>> {
         return Single.defer {
             val sw = Stopwatch.createStarted()
-            logger.debug("--- Converter ---")
+            logger.debug("---------------------")
+            logger.debug("--- Convert START ---")
+            logger.debug("---------------------")
             logger.debug("Directory: in ${fsRunnerPath.toolDir.absolutePath}")
             logger.debug("Tool: in ${fsRunnerPath.toolFile.absolutePath}")
-            logger.debug("Recording text: ${FileUtils.readFileToString(fsRunnerPath.input, Consts.ENCODING)}")
+            logger.debug("Record raw text: ${FileUtils.readFileToString(fsRunnerPath.input, Consts.ENCODING)}")
 //            logger.debug("Recording text: <...>")
+            logger.debug("Record extras: $extras")
             logger.debug("Starting process (${sw.asMillis()})")
             val process = ProcessBuilder("wine", fsRunnerPath.toolFile.absolutePath)
                     .directory(fsRunnerPath.toolDir)
@@ -51,9 +57,15 @@ class ConvertProcessRunnerImpl(
             logger.debug(errorResponse.joinToString("\n"))
             if (!isExitNoError) {
                 logger.warn("Process either did not finish or hard errors!")
+                logger.debug("---------------------")
+                logger.debug("--- Convert END ---")
+                logger.debug("---------------------")
                 Single.error<List<File>>(IllegalStateException("Did not exit with regular process finish"))
             } else {
                 logger.debug("Process end (${sw.asMillis()})")
+                logger.debug("---------------------")
+                logger.debug("--- Convert END ---")
+                logger.debug("---------------------")
                 Single.just(fsSourcePath.formatterFiles())
             }
         }
