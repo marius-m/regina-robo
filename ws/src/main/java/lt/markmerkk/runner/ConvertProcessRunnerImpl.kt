@@ -4,21 +4,25 @@ import com.google.common.base.Stopwatch
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import lt.markmerkk.Consts
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ResourceLoader
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 
 class ConvertProcessRunnerImpl(
         private val fsRunnerPath: FSRunnerPath,
         private val fsSourcePath: FSSourcePath
-): ConvertProcessRunner {
+) : ConvertProcessRunner {
+
+    private var dispTimeout: Disposable? = null
+    private var dispInput: Disposable? = null
+    private var dispError: Disposable? = null
 
     /**
      * Runs a conversion process and returns output
@@ -34,6 +38,7 @@ class ConvertProcessRunnerImpl(
             extras: Map<String, String>
     ): Single<List<File>> {
         return Single.defer {
+            disposeAll()
             val sw = Stopwatch.createStarted()
             logger.debug("---------------------")
             logger.debug("--- Convert START ---")
@@ -47,28 +52,55 @@ class ConvertProcessRunnerImpl(
             val process = ProcessBuilder("wine", fsRunnerPath.toolFile.absolutePath)
                     .directory(fsRunnerPath.toolDir)
                     .start()
-            logger.debug("Scheduling EXIT timeout (${sw.asMillis()})")
-            val isExitNoError: Boolean = process.waitFor(60, TimeUnit.SECONDS)
-            val inputResponse = extractInputStream(process.inputStream)
-            val errorResponse = extractInputStream(process.errorStream)
-            logger.debug("--- IS ---")
-            logger.debug(inputResponse.joinToString("\n"))
-            logger.debug("--- ES ---")
-            logger.debug(errorResponse.joinToString("\n"))
+            dispTimeout = inspectProcessForTimeout(process)
+            dispInput = inspectInputStream("I", process.inputStream)
+            dispError = inspectInputStream("E", process.errorStream)
+            logger.debug("Scheduling EXIT timeout '${PROCESS_TIMEOUT_SECONDS}' (${sw.asMillis()})")
+            val isExitNoError = process.waitFor(PROCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             if (!isExitNoError) {
                 logger.warn("Process either did not finish or hard errors!")
-                logger.debug("---------------------")
-                logger.debug("--- Convert END ---")
-                logger.debug("---------------------")
                 Single.error<List<File>>(IllegalStateException("Did not exit with regular process finish"))
             } else {
                 logger.debug("Process end (${sw.asMillis()})")
-                logger.debug("---------------------")
-                logger.debug("--- Convert END ---")
-                logger.debug("---------------------")
                 Single.just(fsSourcePath.formatterFiles())
             }
+        }.doOnEvent { _, _ ->
+            logger.debug("---------------------")
+            logger.debug("--- Convert END ---")
+            logger.debug("---------------------")
+        }.doFinally {
+            disposeAll()
         }
+    }
+
+    private fun inspectProcessForTimeout(process: Process): Disposable {
+        return Flowable.interval(1L, TimeUnit.SECONDS, Schedulers.io())
+                .subscribe({ ping ->
+                    logger.info("Ping on process ${ping}s / ${PROCESS_TIMEOUT_SECONDS}s")
+                    if (ping >= PROCESS_TIMEOUT_SECONDS) {
+                        process.destroy()
+                    }
+                }, { error ->
+                    logger.warn("Process close inpector error", error)
+                })
+    }
+
+    private fun inspectInputStream(prefix: String, inputStream: InputStream): Disposable {
+        return Completable.fromAction {
+            val isr = InputStreamReader(inputStream)
+            val br = BufferedReader(isr)
+            var output: String?
+            do {
+                output = br.readLine()
+                logger.info("$prefix:$output")
+            } while(output != null)
+            Completable.complete()
+        }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    logger.info("End reading stream: Complete")
+                }, {
+                    logger.info("End reading stream: Error", it)
+                })
     }
 
     private fun extractInputStream(inputStream: InputStream?): List<String> {
@@ -89,8 +121,15 @@ class ConvertProcessRunnerImpl(
                 .toList()
     }
 
+    private fun disposeAll() {
+        dispTimeout?.dispose()
+        dispInput?.dispose()
+        dispError?.dispose()
+    }
+
     companion object {
         private val logger = LoggerFactory.getLogger(ConvertProcessRunnerImpl::class.java)!!
+        const val PROCESS_TIMEOUT_SECONDS = 30L
     }
 
 }

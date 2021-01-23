@@ -30,8 +30,9 @@ class TTSConvertInteractor(
                 .split(text)
                 .map { it.replaceInvalidCharacters() }
         val indexTextSections: List<Pair<Int, String>> = inputAsTextSections
-                .mapIndexed { index, s -> index to s }
+                .mapIndexed { index, section -> index to section }
         return Flowable.fromIterable(indexTextSections)
+                .filter { it.second.isNotBlank() }
                 .flatMapSingle { (index, textSection) ->
                     fsInteractor.createTextAsInput(
                             inputFile = fsSourcePath.inputSource(),
