@@ -1,12 +1,16 @@
 package lt.markmerkk.rabbit
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.rabbitmq.client.AMQP
+import com.rabbitmq.client.Channel
 import lt.markmerkk.Converter
 import lt.markmerkk.entities.RequestInput
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.support.AmqpHeaders
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
 
 @Component
@@ -29,9 +33,13 @@ open class RBProcessing(
      *
      */
     @RabbitListener(queues = [RabbitConfig.queueNameConvert])
-    fun receiveMessage(input: String) {
+    fun receiveMessage(
+            message: String,
+            channel: Channel,
+            @Header(AmqpHeaders.DELIVERY_TAG) tag: Long
+    ) {
         try {
-            val inputAsRequest: Map<String, Any?> = objectMapper.readValue(input, Map::class.java) as Map<String, Any?>
+            val inputAsRequest: Map<String, Any?> = objectMapper.readValue(message, Map::class.java) as Map<String, Any?>
             val inputExtras: InputExtras = InputExtras.fromMap(inputAsRequest)
             if (inputExtras.isEmpty()) {
                 l.warn("No 'text' found in '${inputAsRequest}'")
@@ -46,6 +54,7 @@ open class RBProcessing(
                     ),
                     sanitizeInput(inputAsRequest)
             )
+            channel.basicAck(tag, false)
             l.info("Complete! $convertResult")
             rabbitTemplate.convertAndSend(
                     RabbitConfig.exchangeName,
@@ -53,6 +62,7 @@ open class RBProcessing(
                     objectMapper.writeValueAsString(convertResult)
             )
         } catch (e: IllegalStateException) {
+            channel.basicNack(tag, false, false)
             l.warn("Error converting", e)
         }
     }

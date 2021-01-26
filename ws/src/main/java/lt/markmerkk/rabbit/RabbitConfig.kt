@@ -46,14 +46,12 @@ open class RabbitConfig {
     open fun queBindings(): Declarables {
         val args = mapOf<String, Any>("x-max-priority" to 10)
         val queue1 = Queue(queueNameConvert, false, false, false, args)
-        val queue2 = Queue(queueNameResult, false)
+        //val queue2 = Queue(queueNameResult, false, false , false)
         val topicExchange = TopicExchange(exchangeName)
         return Declarables(
                 queue1,
-                queue2,
                 topicExchange,
-                BindingBuilder.bind(queue1).to(topicExchange).with("rss.convert.*"),
-                BindingBuilder.bind(queue2).to(topicExchange).with("rss.result.*")
+                BindingBuilder.bind(queue1).to(topicExchange).with("rss.convert.*")
         )
     }
 
