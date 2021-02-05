@@ -67,6 +67,7 @@ class TTSTextInteractor(
         return inputText
                 .replace("„", "\"")
                 .replace("“", "\"")
+                .replace("–", "-")
     }
 
     companion object {
