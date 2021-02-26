@@ -1,6 +1,7 @@
 package lt.markmerkk.runner
 
 import com.google.common.base.Stopwatch
+import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
@@ -22,7 +23,6 @@ class ConvertProcessRunnerImpl(
 
     private var dispTimeout: Disposable? = null
     private var dispInput: Disposable? = null
-    private var dispError: Disposable? = null
 
     /**
      * Runs a conversion process and returns output
@@ -85,22 +85,34 @@ class ConvertProcessRunnerImpl(
                 })
     }
 
+    // private fun inspectInputStream(prefix: String, inputStream: InputStream): Disposable {
+    //     return Completable.fromAction {
+    //         val isr = InputStreamReader(inputStream)
+    //         val br = BufferedReader(isr)
+    //         var output: String?
+    //         do {
+    //             output = br.readLine()
+    //             logger.info("$prefix:$output")
+    //         } while(output != null)
+    //         Completable.complete()
+    //     }.subscribeOn(Schedulers.io())
+    //             .subscribe({
+    //                 logger.info("End reading stream: Complete")
+    //             }, {
+    //                 logger.info("End reading stream: Error", it)
+    //             })
+    // }
+
     private fun inspectInputStream(prefix: String, inputStream: InputStream): Disposable {
-        return Completable.fromAction {
-            val isr = InputStreamReader(inputStream)
-            val br = BufferedReader(isr)
-            var output: String?
-            do {
-                output = br.readLine()
-                logger.info("$prefix:$output")
-            } while(output != null)
-            Completable.complete()
-        }.subscribeOn(Schedulers.io())
-                .subscribe({
-                    logger.info("End reading stream: Complete")
-                }, {
-                    logger.info("End reading stream: Error", it)
-                })
+        return Flowable.create<String>(ProcessISEmitter(inputStream), BackpressureStrategy.BUFFER)
+            .subscribeOn(Schedulers.io())
+            .doOnNext { logger.info("${prefix}:${it}") }
+            .timeout(3L, TimeUnit.MINUTES)
+            .subscribe({
+                logger.info("End reading stream: Complete")
+            }, {
+                logger.info("End reading stream: Error", it)
+            })
     }
 
     private fun extractInputStream(inputStream: InputStream?): List<String> {
@@ -124,7 +136,6 @@ class ConvertProcessRunnerImpl(
     private fun disposeAll() {
         dispTimeout?.dispose()
         dispInput?.dispose()
-        dispError?.dispose()
     }
 
     companion object {
