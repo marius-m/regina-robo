@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -54,7 +55,13 @@ class ConvertProcessRunnerImpl(
                     .redirectErrorStream(true)
                     .start()
             dispTimeout = inspectProcessForTimeout(process)
-            dispInput = inspectInputStream("I", process.inputStream)
+            dispInput = inspectInputStream("I", process.inputStream, Schedulers.io())
+                .ignoreElements()
+                .subscribe({
+                    logger.info("End reading stream: Complete")
+                }, {
+                    logger.info("End reading stream: Error", it)
+                })
             logger.debug("Scheduling EXIT timeout '${PROCESS_TIMEOUT_SECONDS}' (${sw.asMillis()})")
             val isExitNoError = process.waitFor(PROCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             if (!isExitNoError) {
@@ -103,16 +110,15 @@ class ConvertProcessRunnerImpl(
     //             })
     // }
 
-    private fun inspectInputStream(prefix: String, inputStream: InputStream): Disposable {
+    internal fun inspectInputStream(
+        prefix: String,
+        inputStream: InputStream,
+        scheduler: Scheduler
+    ): Flowable<String> {
         return Flowable.create<String>(ProcessISEmitter(inputStream), BackpressureStrategy.BUFFER)
-            .subscribeOn(Schedulers.io())
+            .subscribeOn(scheduler)
             .doOnNext { logger.info("${prefix}:${it}") }
             .timeout(3L, TimeUnit.MINUTES)
-            .subscribe({
-                logger.info("End reading stream: Complete")
-            }, {
-                logger.info("End reading stream: Error", it)
-            })
     }
 
     private fun extractInputStream(inputStream: InputStream?): List<String> {
