@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ReginaApp
+open class ReginaApp
 
 fun main(args: Array<String>) {
     runApplication<ReginaApp>(*args)

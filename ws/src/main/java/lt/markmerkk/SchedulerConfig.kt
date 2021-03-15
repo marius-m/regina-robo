@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct
 
 @Configuration
 @EnableScheduling
-class SchedulerConfig(
+open class SchedulerConfig(
         @Autowired private val fsInteractor: TTSFSInteractor,
         @Autowired private val fsSourcePath: FSSourcePath
 ) {

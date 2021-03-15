@@ -1,5 +1,6 @@
 package lt.markmerkk.rabbit
 
+import lt.markmerkk.BuildConfig
 import lt.markmerkk.RabbitCreds
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.BindingBuilder
@@ -20,13 +21,14 @@ import org.springframework.context.annotation.Profile
 open class RabbitConfig {
 
     @Autowired lateinit var rabbitCreds: RabbitCreds
+    @Autowired lateinit var buildConfig: BuildConfig
 
     @Bean
     @Profile("dev")
     open fun connectionFactoryDev(): ConnectionFactory {
         val connectionFactory = CachingConnectionFactory()
         //connectionFactory.setAddresses("10.0.1.150:5672")
-        connectionFactory.setAddresses("192.168.1.205:5672")
+        connectionFactory.setAddresses("${buildConfig.dockerHost}:5672")
         connectionFactory.username = "test"
         connectionFactory.setPassword("test")
         return connectionFactory
@@ -36,7 +38,7 @@ open class RabbitConfig {
     @Profile("prod")
     open fun connectionFactoryProd(): ConnectionFactory {
         val connectionFactory = CachingConnectionFactory()
-        connectionFactory.setAddresses("localhost:5672")
+        connectionFactory.setAddresses("${buildConfig.dockerHost}:5672")
         connectionFactory.username = rabbitCreds.user
         connectionFactory.setPassword(rabbitCreds.pass)
         return connectionFactory

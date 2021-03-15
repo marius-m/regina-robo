@@ -155,14 +155,16 @@ class DefaultComponents {
     open fun provideBuildConfig(
         @Value("\${version}") version: String,
         @Value("\${sentry.dsn}") sentryDsn: String,
+        @Value("\${dockerHost}") dockerHost: String,
         environment: Environment,
         serverProperties: ServerProperties
     ): BuildConfig {
         return BuildConfig(
             version = version,
-            serverPort = serverProperties.port.toString(),
+            serverPort = serverProperties.port?.toString() ?: "8080",
             serverProfiles = environment.activeProfiles.toList(),
-            sentryDsn = sentryDsn
+            sentryDsn = sentryDsn,
+            dockerHost = dockerHost,
         )
     }
 

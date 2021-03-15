@@ -4,7 +4,6 @@ import java.util.Properties
 plugins {
     application
     kotlin("jvm")
-    id("kotlin-spring")
     id("org.springframework.boot")
     id("org.jetbrains.kotlin.plugin.noarg")
 }
@@ -68,6 +67,6 @@ application {
     mainClassName = "lt.markmerkk.ReginaAppKt"
 }
 
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-    launchScript()
+extensions.getByType(org.springframework.boot.gradle.dsl.SpringBootExtension::class.java).apply {
+    buildInfo()
 }
