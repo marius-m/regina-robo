@@ -2,7 +2,14 @@ package lt.markmerkk
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import lt.markmerkk.runner.*
+import lt.markmerkk.runner.ConvertProcessRunner
+import lt.markmerkk.runner.ConvertProcessRunnerImpl
+import lt.markmerkk.runner.FSRunnerPath
+import lt.markmerkk.runner.FSSourcePath
+import lt.markmerkk.runner.TTSAudioConverterMp3
+import lt.markmerkk.runner.TTSAudioFileCombiner
+import lt.markmerkk.runner.TTSFSInteractor
+import lt.markmerkk.runner.TTSTextInteractor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.web.ServerProperties
@@ -27,18 +34,20 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideFsRunnerPath(
-            @Value("\${toolPath}") dirPathTool: String
+        @Value("\${toolPath}") dirPathTool: String,
+        @Value("\${outPath}") outPathTool: String
     ): FSRunnerPath {
         return FSRunnerPath(
-                toolDir = File(dirPathTool)
+            toolDir = File(dirPathTool),
+            outputDir = File(outPathTool),
         )
     }
 
     @Bean
     @Scope("singleton")
     open fun provideFSSourcePath(
-            fsRunnerPath: FSRunnerPath,
-            timeProvider: TimeProvider
+        fsRunnerPath: FSRunnerPath,
+        timeProvider: TimeProvider
     ): FSSourcePath {
         return FSSourcePath(fsRunnerPath, timeProvider)
     }
@@ -46,8 +55,8 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideFsInteractor(
-            fsSourcePath: FSSourcePath,
-            timeProvider: TimeProvider
+        fsSourcePath: FSSourcePath,
+        timeProvider: TimeProvider
     ): TTSFSInteractor {
         return TTSFSInteractor(fsSourcePath, timeProvider)
     }
@@ -55,8 +64,8 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideAudioCombiner(
-            fsSourcePath: FSSourcePath,
-            fsInteractor: TTSFSInteractor
+        fsSourcePath: FSSourcePath,
+        fsInteractor: TTSFSInteractor
     ): TTSAudioFileCombiner {
         return TTSAudioFileCombiner(fsSourcePath)
     }
@@ -64,11 +73,10 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideAudioConverterMp3(
-            fsSourcePath: FSSourcePath
+        fsSourcePath: FSSourcePath
     ): TTSAudioConverterMp3 {
         return TTSAudioConverterMp3(fsSourcePath)
     }
-
 
     @Bean
     @Scope("singleton")
@@ -79,9 +87,9 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideConvertProcessRunner(
-            resourceLoader: ResourceLoader,
-            fsRunnerPath: FSRunnerPath,
-            fsSourcePath: FSSourcePath
+        resourceLoader: ResourceLoader,
+        fsRunnerPath: FSRunnerPath,
+        fsSourcePath: FSSourcePath
     ): ConvertProcessRunner {
         return ConvertProcessRunnerImpl(fsRunnerPath, fsSourcePath)
     }
@@ -89,21 +97,21 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideConvertInteractor(
-            fsRunnerPath: FSRunnerPath,
-            fsSourcePath: FSSourcePath,
-            fsInteractor: TTSFSInteractor,
-            audioFileCombiner: TTSAudioFileCombiner,
-            audioConverterMp3: TTSAudioConverterMp3,
-            textInteractor: TTSTextInteractor,
-            convertProcessRunner: ConvertProcessRunner
+        fsRunnerPath: FSRunnerPath,
+        fsSourcePath: FSSourcePath,
+        fsInteractor: TTSFSInteractor,
+        audioFileCombiner: TTSAudioFileCombiner,
+        audioConverterMp3: TTSAudioConverterMp3,
+        textInteractor: TTSTextInteractor,
+        convertProcessRunner: ConvertProcessRunner
     ): TTSConvertInteractor {
         return TTSConvertInteractor(
-                fsInteractor,
-                textInteractor,
-                audioFileCombiner,
-                audioConverterMp3,
-                convertProcessRunner,
-                fsSourcePath
+            fsInteractor,
+            textInteractor,
+            audioFileCombiner,
+            audioConverterMp3,
+            convertProcessRunner,
+            fsSourcePath
         )
     }
 
@@ -111,26 +119,26 @@ class DefaultComponents {
     @Scope("singleton")
     open fun provideTimeProvider(): TimeProvider {
         return TimeProvider(
-                zoneId = ZoneId.systemDefault(),
-                clock = Clock.systemUTC()
+            zoneId = ZoneId.systemDefault(),
+            clock = Clock.systemUTC()
         )
     }
 
     @Bean
     @Scope("singleton")
     open fun provideConverter(
-            timeProvider: TimeProvider,
-            uuidGenerator: UUIDGenerator,
-            convertInteractor: TTSConvertInteractor,
-            fsSourcePath: FSSourcePath,
-            buildConfig: BuildConfig
+        timeProvider: TimeProvider,
+        uuidGenerator: UUIDGenerator,
+        convertInteractor: TTSConvertInteractor,
+        fsSourcePath: FSSourcePath,
+        buildConfig: BuildConfig
     ): Converter {
         return Converter(
-                timeProvider,
-                uuidGenerator,
-                convertInteractor,
-                fsSourcePath,
-                buildConfig
+            timeProvider,
+            uuidGenerator,
+            convertInteractor,
+            fsSourcePath,
+            buildConfig
         )
     }
 
@@ -145,31 +153,30 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideBuildConfig(
-            @Value("\${version}") version: String,
-            @Value("\${sentry.dsn}") sentryDsn: String,
-            environment: Environment,
-            serverProperties: ServerProperties
+        @Value("\${version}") version: String,
+        @Value("\${sentry.dsn}") sentryDsn: String,
+        environment: Environment,
+        serverProperties: ServerProperties
     ): BuildConfig {
         return BuildConfig(
-                version = version,
-                serverPort = serverProperties.port.toString(),
-                serverProfiles = environment.activeProfiles.toList(),
-                sentryDsn = sentryDsn
+            version = version,
+            serverPort = serverProperties.port.toString(),
+            serverProfiles = environment.activeProfiles.toList(),
+            sentryDsn = sentryDsn
         )
     }
 
     @Bean
     @Scope("singleton")
     open fun provideRabbitCreds(
-            @Value("\${rabbit.user}") user: String,
-            @Value("\${rabbit.pass}") pass: String
+        @Value("\${rabbit.user}") user: String,
+        @Value("\${rabbit.pass}") pass: String
     ): RabbitCreds {
         return RabbitCreds(
-                user = user,
-                pass = pass
+            user = user,
+            pass = pass
         )
     }
 
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!
-
 }

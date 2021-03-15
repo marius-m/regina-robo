@@ -1,6 +1,6 @@
 object Versions {
-    val kotlin = "1.3.70"
-    val springBoot = "2.2.6.RELEASE"
+    val kotlin = "1.4.10"
+    val springBoot = "2.3.3.RELEASE"
     val kotlinTest = "2.1.0"
 
     val slf4j = "1.7.30"

@@ -32,7 +32,7 @@ class FSSourcePath(
     }
 
     fun outputDir(): File {
-        val outputDir = File(fsRunnerPath.toolDir, Paths.TTS_OUTPUT_DIR)
+        val outputDir = fsRunnerPath.outputDir
         if (!outputDir.exists()) {
             outputDir.mkdirs()
         }

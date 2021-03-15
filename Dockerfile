@@ -1,18 +1,13 @@
-FROM openjdk:8-jdk-alpine
+FROM azul/zulu-openjdk:8
 
-RUN apk update && apk add wine && ln -s /usr/bin/wine64 /usr/bin/wine
-
-# Prepare tessearct
-#RUN yes | apt install tesseract-ocr
-#RUN mkdir -p /usr/share/tessdata
-#ADD https://github.com/tesseract-ocr/tessdata/raw/master/lit.traineddata /usr/share/tessdata/lit.traineddata
-#ADD https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata /usr/share/tessdata/eng.traineddata
-#RUN chown -R spring:spring /usr/share/tessdata && chmod 770 /usr/share/tessdata
-#RUN tesseract --list-langs
-#RUN tesseract -v
+RUN dpkg --add-architecture i386
+RUN apt-get update
+RUN yes | apt-get install wine32
+RUN yes | apt-get install wine64
 
 # Prep formatter
-ADD /Volumes/MMSandisk/tilde/formatter /usr/local/
+RUN mkdir -p /usr/local/formatter
+COPY formatter /usr/local/formatter
 
 EXPOSE 8080
 
@@ -21,4 +16,4 @@ ENV APP_PATH /app.jar
 ENV APP_ENV=dev
 ENV APP_PORT=8080
 
-ENTRYPOINT java -jar /app.jar
+ENTRYPOINT java -Dspring.profiles.active=dev -Dserver.port=8080 -DtoolPath=/usr/local/formatter -jar /app.jar

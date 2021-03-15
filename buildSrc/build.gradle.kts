@@ -18,7 +18,7 @@ object Versions {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10")
 
     implementation(gradleApi())
     implementation(localGroovy())

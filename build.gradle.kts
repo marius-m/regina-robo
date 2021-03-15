@@ -7,6 +7,8 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+        maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${Versions.springBoot}")
