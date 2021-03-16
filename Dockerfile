@@ -1,6 +1,6 @@
 FROM azul/zulu-openjdk:8
 
-RUN useradd spring
+RUN useradd -m spring
 
 RUN dpkg --add-architecture i386
 RUN apt-get update
@@ -23,5 +23,4 @@ RUN mkdir -p /usr/local/formatter && chown -R spring:spring /usr/local/formatter
 RUN mkdir -p /usr/local/res && chown -R spring:spring /usr/local/res && chmod -R 777 /usr/local/res
 
 USER spring:spring
-#ENTRYPOINT java -Dspring.profiles.active=dev -DdockerHost=${DOCKER_HOST} -Dserver.port=8080 -DtoolPath=/usr/local/formatter -DoutPath=/usr/local/res -jar /app.jar
 ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-DdockerHost=${DOCKER_HOST}", "-Dserver.port=8080", "-DtoolPath=/usr/local/formatter", "-DoutPath=/usr/local/res", "-jar", "/app.jar"]

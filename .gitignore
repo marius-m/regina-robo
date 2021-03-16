@@ -52,3 +52,4 @@ ws/build
 .vagrant
 ubuntu-bionic*
 formatter/
+tts_output/

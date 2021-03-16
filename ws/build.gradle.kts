@@ -36,7 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator:${Versions.springBoot}")
 
     // Other
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.2")
     implementation("commons-io:commons-io:2.5")
     implementation("com.google.guava:guava:29.0-jre")
     implementation("io.reactivex.rxjava3:rxjava:3.0.6")
