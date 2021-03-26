@@ -1,10 +1,6 @@
 package lt.markmerkk.runner
 
-import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.schedulers.TestScheduler
-import io.reactivex.rxjava3.subscribers.TestSubscriber
-import org.assertj.core.api.Assertions
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -13,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 class ConvertProcessRunnerImplInspectInputStreamTest {
 
-    @Mock lateinit var fsRunnerPath: FSRunnerPath
+    @Mock lateinit var fsRunnerPath: FSRunnerPathWine
     @Mock lateinit var fsSourcePath: FSSourcePath
     lateinit var runner : ConvertProcessRunnerImpl
 

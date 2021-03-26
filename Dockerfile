@@ -1,11 +1,12 @@
-FROM azul/zulu-openjdk:8
+FROM adoptopenjdk:11-jdk
 
 RUN useradd -m spring
 
 RUN dpkg --add-architecture i386
 RUN apt-get update
 RUN yes | apt-get install wine32
-RUN yes | apt-get install wine64
+RUN yes | apt-get install htop
+#RUN yes | apt-get install wine64
 
 # Prep formatter
 RUN mkdir -p /usr/local/formatter
@@ -23,4 +24,4 @@ RUN mkdir -p /usr/local/formatter && chown -R spring:spring /usr/local/formatter
 RUN mkdir -p /usr/local/res && chown -R spring:spring /usr/local/res && chmod -R 777 /usr/local/res
 
 USER spring:spring
-ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-DdockerHost=${DOCKER_HOST}", "-Dserver.port=8080", "-DtoolPath=/usr/local/formatter", "-DoutPath=/usr/local/res", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-DdockerPort=8080", "-DdockerHost=${DOCKER_HOST}", "-Dserver.port=8080", "-DtoolPath=/usr/local/formatter", "-DoutPath=/usr/local/res", "-jar", "/app.jar"]

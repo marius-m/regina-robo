@@ -1,0 +1,40 @@
+#syntax=docker/dockerfile:experimental
+FROM debian:bullseye-slim AS build
+WORKDIR /workspace/app
+
+
+COPY . /workspace/app
+RUN --mount=type=cache,target=/root/.gradle ./gradlew :ws:assemble
+RUN mkdir -p ws/build/dependency && (cd ws/build/dependency; jar -xf ../libs/*.jar)
+
+# Runner phase
+FROM openjdk:11-jdk
+VOLUME /tmp
+
+RUN useradd -m spring
+
+# Prepare tessearct
+RUN apt update
+
+EXPOSE 8080
+
+# Prepare spring service as JAR
+#COPY ws/build/libs/*.jar /app.jar
+#ENV APP_PATH /app.jar
+#RUN chown spring:spring $APP_PATH && chmod 500 $APP_PATH
+
+# Prepare spring service as FS
+ARG DEPENDENCY=/workspace/app/ws/build/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+
+ENV APP_ENV=dev
+ENV APP_PORT=8080
+ENV TESS_DATA_PATH=/usr/share/tessdata
+RUN mkdir -p /usr/local/logs && chown -R spring:spring /usr/local/logs && chmod -R 770 /usr/local/logs
+RUN mkdir -p /usr/local/tmp && chown -R spring:spring /usr/local/tmp && chmod -R 770 /usr/local/tmp
+
+# Run service
+USER spring:spring
+ENTRYPOINT ["java", "-cp", "app:app/lib/*", "-DtmpPath=/usr/local/tmp", "-DLOG_PATH=/usr/local/logs", "lt.ito.bunasta.ocr.BunastaOcrAppKt" ]

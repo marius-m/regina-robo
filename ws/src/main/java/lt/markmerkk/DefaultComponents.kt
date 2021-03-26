@@ -3,8 +3,10 @@ package lt.markmerkk
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import lt.markmerkk.runner.ConvertProcessRunner
-import lt.markmerkk.runner.ConvertProcessRunnerImpl
+import lt.markmerkk.runner.ConvertProcessRunnerDocker
 import lt.markmerkk.runner.FSRunnerPath
+import lt.markmerkk.runner.FSRunnerPathDocker
+import lt.markmerkk.runner.FSRunnerPathWine
 import lt.markmerkk.runner.FSSourcePath
 import lt.markmerkk.runner.TTSAudioConverterMp3
 import lt.markmerkk.runner.TTSAudioFileCombiner
@@ -12,7 +14,6 @@ import lt.markmerkk.runner.TTSFSInteractor
 import lt.markmerkk.runner.TTSTextInteractor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Scope
 import org.springframework.core.env.Environment
@@ -37,7 +38,11 @@ class DefaultComponents {
         @Value("\${toolPath}") dirPathTool: String,
         @Value("\${outPath}") outPathTool: String
     ): FSRunnerPath {
-        return FSRunnerPath(
+        // return FSRunnerPathWine(
+        //     toolDir = File(dirPathTool),
+        //     outputDir = File(outPathTool),
+        // )
+        return FSRunnerPathDocker(
             toolDir = File(dirPathTool),
             outputDir = File(outPathTool),
         )
@@ -91,7 +96,8 @@ class DefaultComponents {
         fsRunnerPath: FSRunnerPath,
         fsSourcePath: FSSourcePath
     ): ConvertProcessRunner {
-        return ConvertProcessRunnerImpl(fsRunnerPath, fsSourcePath)
+        //return ConvertProcessRunnerImpl(fsRunnerPath, fsSourcePath)
+        return ConvertProcessRunnerDocker(fsRunnerPath, fsSourcePath)
     }
 
     @Bean
@@ -155,13 +161,13 @@ class DefaultComponents {
     open fun provideBuildConfig(
         @Value("\${version}") version: String,
         @Value("\${sentry.dsn}") sentryDsn: String,
+        @Value("\${dockerPort}") dockerPort: String,
         @Value("\${dockerHost}") dockerHost: String,
         environment: Environment,
-        serverProperties: ServerProperties
     ): BuildConfig {
         return BuildConfig(
             version = version,
-            serverPort = serverProperties.port?.toString() ?: "8080",
+            serverPort = dockerPort,
             serverProfiles = environment.activeProfiles.toList(),
             sentryDsn = sentryDsn,
             dockerHost = dockerHost,

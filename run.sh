@@ -12,4 +12,4 @@ OS_TYPE=$(uname)
 BUILD_NAME="markmerkk/robo-regina"
 
 echo "-- Running docker image --"
-docker run -v /Users/mariusmerkevicius/Projects/personal/regina-robo/tts_output:/usr/local/res -e DOCKER_HOST=host.docker.internal -p 8080:8080 -v $BUILD_NAME:$IN_VERSION_NAME
+docker run -m 1024m --pids-limit 100 -v /Users/mariusmerkevicius/Projects/personal/regina-robo/tts_output:/usr/local/res -e DOCKER_HOST=host.docker.internal -p 8080:8080 $BUILD_NAME:$IN_VERSION_NAME

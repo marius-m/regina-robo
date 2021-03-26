@@ -82,8 +82,8 @@ class FSSourcePath(
     /**
      * Lists all available output files in formatter
      */
-    fun formatterFiles(): List<File> {
-        val formatterFiles = formatterDir()
+    fun formatterFiles(formatterDir: File): List<File> {
+        val formatterFiles = formatterDir
                 .listFiles(FormatterOutputFilter()) ?: emptyArray()
         return formatterFiles.toList()
                 .plus(unencodedInputSource())

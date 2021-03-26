@@ -17,7 +17,7 @@ class TTSFSInteractor(
 
     fun cleanUpFormatter(): Completable {
         return Completable.fromAction {
-            sourcePath.formatterFiles()
+            sourcePath.formatterFiles(sourcePath.formatterDir())
                     .forEach {
                         logger.debug("Removing: ${it.absolutePath}")
                         it.delete()
