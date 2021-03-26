@@ -1,7 +1,6 @@
 package lt.markmerkk
 
 object Paths {
-    const val TTS_TOOL_PATH = "formatter-docker"
     const val TTS_TOOL = "run.sh"
     const val TTS_INPUT = "duom.txt"
     const val TTS_INPUT_NO_ENCODING = "duom-utf8.txt"

@@ -51,5 +51,8 @@ LOG_PATH_IS_UNDEFINED
 ws/build
 .vagrant
 ubuntu-bionic*
-formatter/
 tts_output/
+robo-docker-run/duom.txt
+robo-docker-run/formatter-input/*
+robo-docker-run/formatter-output/*
+robo-docker-build/formatter/
