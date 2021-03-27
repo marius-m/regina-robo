@@ -4,7 +4,12 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import lt.markmerkk.config.TTSRecordConfig
-import lt.markmerkk.runner.*
+import lt.markmerkk.runner.ConvertProcessRunner
+import lt.markmerkk.runner.FSSourcePath
+import lt.markmerkk.runner.TTSAudioConverterMp3
+import lt.markmerkk.runner.TTSAudioFileCombiner
+import lt.markmerkk.runner.TTSFSInteractor
+import lt.markmerkk.runner.TTSTextInteractor
 import java.io.File
 import java.time.LocalDateTime
 
@@ -27,12 +32,13 @@ class TTSConvertInteractor(
             extras: Map<String, String>
     ): Flowable<List<File>> {
         val inputAsTextSections = textInteractor
-                .split(text)
-                .map { textInteractor.removeUrls(it) }
-                .map { textInteractor.replaceInvalidCharacters(it) }
-                .map { textInteractor.splitLongSentences(it, TTSTextInteractor.DEFAULT_MAX_SYMBOLS_PER_WORD) }
+            .split(text)
+            .map { textInteractor.rmBreaks(it) }
+            .map { textInteractor.removeUrls(it) }
+            .map { textInteractor.replaceInvalidCharacters(it) }
+            .map { textInteractor.splitLongSentences(it, TTSTextInteractor.DEFAULT_MAX_SYMBOLS_PER_WORD) }
         val indexTextSections: List<Pair<Int, String>> = inputAsTextSections
-                .mapIndexed { index, section -> index to section }
+            .mapIndexed { index, section -> index to section }
         return Flowable.fromIterable(indexTextSections)
                 .filter { it.second.isNotBlank() }
                 .flatMapSingle { (index, textSection) ->

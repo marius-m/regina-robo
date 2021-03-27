@@ -4,11 +4,6 @@ class TTSTextInteractor(
         private val maxSymbolsPerSection: Int
 ) {
 
-    fun rmAllBreaks(inputText: String): String {
-        return inputText
-                .replace("\n", " ")
-    }
-
     /**
      * Splits text into sections
      * Always return at least one section
@@ -35,6 +30,12 @@ class TTSTextInteractor(
             textInSections.add(currentSection.trim())
         }
         return textInSections.toList()
+    }
+
+    fun rmBreaks(inputSentence: String): String {
+        return inputSentence
+            .replace("\n", "; ")
+            .replace("\r", "")
     }
 
     fun removeUrls(inputSentence: String): String {
