@@ -61,7 +61,7 @@ open class RBProcessing(
                     "rss.result.text",
                     objectMapper.writeValueAsString(convertResult)
             )
-        } catch (e: IllegalStateException) {
+        } catch (e: Exception) {
             channel.basicNack(tag, false, false)
             l.warn("Error converting", e)
         }
