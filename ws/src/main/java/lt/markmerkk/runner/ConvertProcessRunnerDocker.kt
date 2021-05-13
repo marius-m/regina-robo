@@ -105,7 +105,7 @@ class ConvertProcessRunnerDocker(
 
     companion object {
         private val logger = LoggerFactory.getLogger(ConvertProcessRunnerImpl::class.java)!!
-        const val PROCESS_TIMEOUT_SECONDS = 30L
+        const val PROCESS_TIMEOUT_SECONDS = 120L
     }
 
 }
