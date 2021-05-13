@@ -1,10 +1,11 @@
 package lt.markmerkk.rabbit
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.rabbitmq.client.AMQP
 import com.rabbitmq.client.Channel
 import lt.markmerkk.Converter
+import lt.markmerkk.UUIDGenerator
 import lt.markmerkk.entities.RequestInput
+import lt.markmerkk.runner.DockerProcessStopper
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -15,9 +16,11 @@ import org.springframework.stereotype.Component
 
 @Component
 open class RBProcessing(
-        @Autowired private val converter: Converter,
-        @Autowired private val objectMapper: ObjectMapper,
-        @Autowired private val rabbitTemplate: RabbitTemplate
+    @Autowired private val uuidGenerator: UUIDGenerator,
+    @Autowired private val converter: Converter,
+    @Autowired private val objectMapper: ObjectMapper,
+    @Autowired private val rabbitTemplate: RabbitTemplate,
+    @Autowired private val dockerProcessStopper: DockerProcessStopper
 ) {
 
     /**
@@ -38,6 +41,7 @@ open class RBProcessing(
             channel: Channel,
             @Header(AmqpHeaders.DELIVERY_TAG) tag: Long
     ) {
+        val targetId = uuidGenerator.generate()
         try {
             val inputAsRequest: Map<String, Any?> = objectMapper.readValue(message, Map::class.java) as Map<String, Any?>
             val inputExtras: InputExtras = InputExtras.fromMap(inputAsRequest)
@@ -47,12 +51,13 @@ open class RBProcessing(
             }
             l.info("Processing input")
             val convertResult = converter.processRun(
-                    RequestInput(
-                            inputText = inputExtras.text,
-                            extraEntityId = inputExtras.extraEntityId,
-                            extraTextId = inputExtras.extraTextId
-                    ),
-                    sanitizeInput(inputAsRequest)
+                targetId = targetId,
+                inputRequest = RequestInput(
+                    inputText = inputExtras.text,
+                    extraEntityId = inputExtras.extraEntityId,
+                    extraTextId = inputExtras.extraTextId
+                ),
+                extra = sanitizeInput(inputAsRequest)
             )
             channel.basicAck(tag, false)
             l.info("Complete! $convertResult")
@@ -64,6 +69,7 @@ open class RBProcessing(
         } catch (e: Exception) {
             channel.basicNack(tag, false, false)
             l.warn("Error converting", e)
+            dockerProcessStopper.stop(targetId)
         }
     }
 

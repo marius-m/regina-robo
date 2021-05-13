@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import lt.markmerkk.runner.ConvertProcessRunner
 import lt.markmerkk.runner.ConvertProcessRunnerDocker
+import lt.markmerkk.runner.DockerProcessStopper
 import lt.markmerkk.runner.FSRunnerPath
 import lt.markmerkk.runner.FSRunnerPathDocker
 import lt.markmerkk.runner.FSRunnerPathWine
@@ -94,10 +95,11 @@ class DefaultComponents {
     open fun provideConvertProcessRunner(
         resourceLoader: ResourceLoader,
         fsRunnerPath: FSRunnerPath,
-        fsSourcePath: FSSourcePath
+        fsSourcePath: FSSourcePath,
+        uuidGenerator: UUIDGenerator,
     ): ConvertProcessRunner {
         //return ConvertProcessRunnerImpl(fsRunnerPath, fsSourcePath)
-        return ConvertProcessRunnerDocker(fsRunnerPath, fsSourcePath)
+        return ConvertProcessRunnerDocker(fsRunnerPath, fsSourcePath, uuidGenerator)
     }
 
     @Bean
@@ -184,6 +186,14 @@ class DefaultComponents {
             user = user,
             pass = pass
         )
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun provideDockerProcessStopper(
+        fsRunnerPath: FSRunnerPath,
+    ): DockerProcessStopper {
+        return DockerProcessStopper(fsRunnerPath)
     }
 
     private val logger = LoggerFactory.getLogger(DefaultComponents::class.java)!!

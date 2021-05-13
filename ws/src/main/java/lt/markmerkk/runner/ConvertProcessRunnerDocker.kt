@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import lt.markmerkk.Consts
+import lt.markmerkk.UUIDGenerator
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -15,8 +16,9 @@ import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 class ConvertProcessRunnerDocker(
-        private val fsRunnerPath: FSRunnerPath,
-        private val fsSourcePath: FSSourcePath
+    private val fsRunnerPath: FSRunnerPath,
+    private val fsSourcePath: FSSourcePath,
+    private val uuidGenerator: UUIDGenerator,
 ) : ConvertProcessRunner {
 
     private var dispTimeout: Disposable? = null
@@ -41,7 +43,8 @@ class ConvertProcessRunnerDocker(
             val formatterInput = File(fsRunnerPath.toolDir, "/formatter-input")
             val formatterOutput = File(fsRunnerPath.toolDir, "/formatter-output")
             FileUtils.copyFileToDirectory(fsRunnerPath.input, formatterInput)
-            val process = ProcessBuilder("/bin/bash", "./run.sh")
+            val dockerContainerName = "wine1-${id}"
+            val process = ProcessBuilder("/bin/bash", "./run.sh", dockerContainerName)
                     .directory(fsRunnerPath.toolDir)
                     .redirectErrorStream(true)
                     .start()
@@ -102,7 +105,7 @@ class ConvertProcessRunnerDocker(
 
     companion object {
         private val logger = LoggerFactory.getLogger(ConvertProcessRunnerImpl::class.java)!!
-        const val PROCESS_TIMEOUT_SECONDS = 60L
+        const val PROCESS_TIMEOUT_SECONDS = 30L
     }
 
 }

@@ -7,7 +7,6 @@ import lt.markmerkk.entities.ResponseOutput
 import lt.markmerkk.runner.FSSourcePath
 import lt.markmerkk.runner.asNamedString
 import java.io.File
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -23,14 +22,14 @@ class Converter(
 
     @Throws(IllegalStateException::class)
     fun processRun(
-            inputRequest: RequestInput,
-            extra: Map<String, Any> = emptyMap()
+        targetId: String = uuidGenerator.generate(),
+        inputRequest: RequestInput,
+        extra: Map<String, Any> = emptyMap()
     ): ResponseOutput {
         if (isRunning.get()) {
             throw IllegalStateException("Process already running")
         }
         isRunning.set(true)
-        val targetId = uuidGenerator.generate()
         val now = timeProvider.now()
         val sw = Stopwatch.createStarted()
         val outputFiles: List<File> = convertInteractor.streamCleanUp()
