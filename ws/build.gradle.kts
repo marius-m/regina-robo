@@ -19,8 +19,6 @@ version = appProps.getProperty("version")
 
 repositories {
     mavenCentral()
-    maven("http://repo1.maven.org/maven2")
-    maven("http://myrepo.net/repo")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
