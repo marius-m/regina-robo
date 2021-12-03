@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "8129ab61-8fb5-4cdb-bd2c-fa3c99918841",
+		"name": "Regina-robo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Run",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"inputText\": \"Super\", \"extraEntityId\": \"id1\", \"extraTextId\": \"id2\"}"
+				},
+				"url": {
+					"raw": "{{HOST}}/api/process-run",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"process-run"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clean formatter",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/process-clean",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"process-clean"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clean output dir",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{HOST}}/api/output-clean",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"api",
+						"output-clean"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
