@@ -24,11 +24,13 @@ open class SchedulerConfig(
 
     @PostConstruct
     fun onAttach() {
-        Sentry.init { options ->
-            options.isEnableExternalConfiguration = true
-            options.dsn = buildConfig.sentryDsn
-            options.environment = env.activeProfiles.joinToString(",")
-            options.release = buildConfig.version
+        if (buildConfig.sentryDsn.isNotEmpty()) {
+            Sentry.init { options ->
+                options.isEnableExternalConfiguration = true
+                options.dsn = buildConfig.sentryDsn
+                options.environment = env.activeProfiles.joinToString(",")
+                options.release = buildConfig.version
+            }
         }
     }
 

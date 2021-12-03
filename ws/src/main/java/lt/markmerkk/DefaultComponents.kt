@@ -26,7 +26,7 @@ import java.io.File
 import java.time.Clock
 import java.time.ZoneId
 
-@PropertySource("classpath:/creds.properties")
+@PropertySource("classpath:/creds.properties", ignoreResourceNotFound = true)
 @Component
 class DefaultComponents {
 
@@ -175,7 +175,7 @@ class DefaultComponents {
             version = version,
             serverPort = dockerPort,
             serverProfiles = environment.activeProfiles.toList(),
-            sentryDsn = environment.getProperty("sentry.dsn"),
+            sentryDsn = environment.getProperty("sentry.dsn") ?: "",
             dockerHost = dockerHost,
         )
     }
@@ -186,8 +186,8 @@ class DefaultComponents {
         environment: Environment,
     ): RabbitCreds {
         return RabbitCreds(
-            user = environment.getProperty("rabbit.user"),
-            pass = environment.getProperty("rabbit.pass")
+            user = environment.getProperty("rabbit.user") ?: "",
+            pass = environment.getProperty("rabbit.pass") ?: ""
         )
     }
 
