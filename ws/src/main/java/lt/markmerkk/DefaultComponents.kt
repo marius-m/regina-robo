@@ -14,8 +14,10 @@ import lt.markmerkk.runner.TTSAudioFileCombiner
 import lt.markmerkk.runner.TTSFSInteractor
 import lt.markmerkk.runner.TTSTextInteractor
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.Scope
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ResourceLoader
@@ -24,8 +26,11 @@ import java.io.File
 import java.time.Clock
 import java.time.ZoneId
 
+@PropertySource("classpath:/creds.properties")
 @Component
 class DefaultComponents {
+
+    @Autowired lateinit var environment: Environment
 
     @Bean
     @Scope("singleton")
@@ -162,7 +167,6 @@ class DefaultComponents {
     @Scope("singleton")
     open fun provideBuildConfig(
         @Value("\${version}") version: String,
-        @Value("\${sentry.dsn}") sentryDsn: String,
         @Value("\${dockerPort}") dockerPort: String,
         @Value("\${dockerHost}") dockerHost: String,
         environment: Environment,
@@ -171,7 +175,7 @@ class DefaultComponents {
             version = version,
             serverPort = dockerPort,
             serverProfiles = environment.activeProfiles.toList(),
-            sentryDsn = sentryDsn,
+            sentryDsn = environment.getProperty("sentry.dsn"),
             dockerHost = dockerHost,
         )
     }
@@ -179,12 +183,11 @@ class DefaultComponents {
     @Bean
     @Scope("singleton")
     open fun provideRabbitCreds(
-        @Value("\${rabbit.user}") user: String,
-        @Value("\${rabbit.pass}") pass: String
+        environment: Environment,
     ): RabbitCreds {
         return RabbitCreds(
-            user = user,
-            pass = pass
+            user = environment.getProperty("rabbit.user"),
+            pass = environment.getProperty("rabbit.pass")
         )
     }
 

@@ -29,8 +29,8 @@ open class RabbitConfig {
         val connectionFactory = CachingConnectionFactory()
         //connectionFactory.setAddresses("10.0.1.150:5672")
         connectionFactory.setAddresses("${buildConfig.dockerHost}:5672")
-        connectionFactory.username = "test"
-        connectionFactory.setPassword("test")
+        connectionFactory.username = "springtest"
+        connectionFactory.setPassword("testspring")
         return connectionFactory
     }
 

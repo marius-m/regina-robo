@@ -38,7 +38,6 @@ dependencies {
     implementation("commons-io:commons-io:2.5")
     implementation("com.google.guava:guava:29.0-jre")
     implementation("io.reactivex.rxjava3:rxjava:3.0.6")
-    implementation("io.sentry:sentry-spring-boot-starter:3.2.0")
     implementation("io.sentry:sentry-logback:3.2.0")
     implementation("ws.schild:jave-core:2.5.1")
     implementation("ws.schild:jave-nativebin-linux64:2.5.1")
